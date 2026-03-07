@@ -48,6 +48,12 @@ public class SlidingDoor : MonoBehaviour
         }
 
         doorCollider = GetComponent<BoxCollider>();
+
+        int wallLayer = LayerMask.NameToLayer("Wall");
+        if (wallLayer >= 0)
+        {
+            gameObject.layer = wallLayer;
+        }
     }
 
     /// <summary>

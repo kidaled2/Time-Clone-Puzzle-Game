@@ -6,7 +6,7 @@ namespace TimeClone.Recording
 {
     public sealed class MovementRecorder : MonoBehaviour, IRecordable
     {
-        [SerializeField] private PlayerInputHandler inputHandler;
+        [SerializeField] private PlayerMovementController movementController;
         [SerializeField] private Transform trackedTransform;
 
         private readonly List<MovementFrame> recordedFrames = new List<MovementFrame>();
@@ -15,9 +15,9 @@ namespace TimeClone.Recording
 
         private void Awake()
         {
-            if (inputHandler == null)
+            if (movementController == null)
             {
-                inputHandler = GetComponent<PlayerInputHandler>();
+                movementController = GetComponent<PlayerMovementController>();
             }
 
             if (trackedTransform == null)
@@ -28,41 +28,41 @@ namespace TimeClone.Recording
 
         private void OnEnable()
         {
-            if (inputHandler != null)
+            if (movementController != null)
             {
-                inputHandler.OnMoveInput += HandleMoveInput;
+                movementController.OnMoveConfirmed += RecordFrame;
             }
         }
 
         private void OnDisable()
         {
-            if (inputHandler != null)
+            if (movementController != null)
             {
-                inputHandler.OnMoveInput -= HandleMoveInput;
+                movementController.OnMoveConfirmed -= RecordFrame;
             }
         }
 
         /// <summary>
-        /// Sets the input handler source used to receive movement input events.
+        /// Sets the movement controller source used to receive confirmed movement events.
         /// </summary>
-        /// <param name="handler">The input handler that emits movement events.</param>
-        public void SetInputHandler(PlayerInputHandler handler)
+        /// <param name="controller">The movement controller that emits confirmed move events.</param>
+        public void SetMovementController(PlayerMovementController controller)
         {
-            if (inputHandler == handler)
+            if (movementController == controller)
             {
                 return;
             }
 
-            if (isActiveAndEnabled && inputHandler != null)
+            if (isActiveAndEnabled && movementController != null)
             {
-                inputHandler.OnMoveInput -= HandleMoveInput;
+                movementController.OnMoveConfirmed -= RecordFrame;
             }
 
-            inputHandler = handler;
+            movementController = controller;
 
-            if (isActiveAndEnabled && inputHandler != null)
+            if (isActiveAndEnabled && movementController != null)
             {
-                inputHandler.OnMoveInput += HandleMoveInput;
+                movementController.OnMoveConfirmed += RecordFrame;
             }
         }
 
@@ -110,7 +110,7 @@ namespace TimeClone.Recording
             return new List<MovementFrame>(recordedFrames);
         }
 
-        private void HandleMoveInput(Vector2 inputDirection)
+        private void RecordFrame(Vector2 inputDirection)
         {
             if (!isRecording)
             {

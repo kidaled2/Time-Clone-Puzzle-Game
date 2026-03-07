@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -44,6 +45,7 @@ namespace TimeClone.Player
         private Rigidbody rb;
 
         public string ActorId => "Player";
+        public event Action<Vector2> OnMoveConfirmed;
 
 #if DOTWEEN
         private Tween movementTween;
@@ -126,6 +128,11 @@ namespace TimeClone.Player
                 return;
             }
 
+            if (movementSpeed <= 0f || gridStepDistance <= 0f)
+            {
+                return;
+            }
+
             Vector3 targetPosition = GetCurrentPosition() + (worldDirection * gridStepDistance);
             targetPosition = new Vector3(
                 Mathf.Round(targetPosition.x),
@@ -142,6 +149,7 @@ namespace TimeClone.Player
                 StopCoroutine(moveRoutine);
             }
 
+            OnMoveConfirmed?.Invoke(inputDirection);
             StartMovement(targetPosition, worldDirection);
         }
 

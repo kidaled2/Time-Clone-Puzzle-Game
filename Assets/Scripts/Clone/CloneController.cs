@@ -7,6 +7,9 @@ public class CloneController : MonoBehaviour, IActorTag
 {
     [SerializeField] private MeshRenderer visualRenderer;
     [SerializeField] private MeshRenderer rimRenderer;
+    [SerializeField] private LayerMask wallLayerMask;
+    [SerializeField] private Vector3 obstacleCheckHalfExtents = new Vector3(0.35f, 0.5f, 0.35f);
+    [SerializeField, Min(0f)] private float obstacleCheckVerticalOffset = 0.5f;
 
     private string actorId = "Clone_1";
     private List<MovementFrame> frames;
@@ -14,6 +17,11 @@ public class CloneController : MonoBehaviour, IActorTag
     private float moveSpeed = 8f;
 
     public string ActorId => actorId;
+
+    private void Awake()
+    {
+        TryAssignWallLayerIfUnset();
+    }
 
     /// <summary>
     /// Initializes this clone with identity, frame data, visuals, and movement speed.
@@ -83,6 +91,11 @@ public class CloneController : MonoBehaviour, IActorTag
                 transform.position.y,
                 Mathf.Round(transform.position.z + isoDirection.z));
 
+            if (IsBlocked(target))
+            {
+                continue;
+            }
+
             yield return StartCoroutine(MoveToTarget(target));
         }
 
@@ -119,5 +132,30 @@ public class CloneController : MonoBehaviour, IActorTag
         if (input == Vector2.left) return new Vector3(-1f, 0f, 0f);
         if (input == Vector2.right) return new Vector3(1f, 0f, 0f);
         return Vector3.zero;
+    }
+
+    private bool IsBlocked(Vector3 targetPosition)
+    {
+        Vector3 checkCenter = targetPosition + (Vector3.up * obstacleCheckVerticalOffset);
+        return Physics.CheckBox(
+            checkCenter,
+            obstacleCheckHalfExtents,
+            Quaternion.identity,
+            wallLayerMask,
+            QueryTriggerInteraction.Ignore);
+    }
+
+    private void TryAssignWallLayerIfUnset()
+    {
+        if (wallLayerMask.value != 0)
+        {
+            return;
+        }
+
+        int wallLayer = LayerMask.NameToLayer("Wall");
+        if (wallLayer >= 0)
+        {
+            wallLayerMask = 1 << wallLayer;
+        }
     }
 }
