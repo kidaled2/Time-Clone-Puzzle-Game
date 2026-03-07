@@ -11,6 +11,7 @@ namespace TimeClone.Recording
 
         private readonly List<MovementFrame> recordedFrames = new List<MovementFrame>();
         private bool isRecording;
+        private float recordingStartTime;
 
         private void Awake()
         {
@@ -79,6 +80,8 @@ namespace TimeClone.Recording
         /// </summary>
         public void StartRecording()
         {
+            recordedFrames.Clear();
+            recordingStartTime = Time.time;
             isRecording = true;
         }
 
@@ -115,7 +118,7 @@ namespace TimeClone.Recording
             }
 
             Vector3 worldPosition = trackedTransform != null ? trackedTransform.position : transform.position;
-            recordedFrames.Add(new MovementFrame(Time.time, inputDirection, worldPosition));
+            recordedFrames.Add(new MovementFrame(Time.time - recordingStartTime, inputDirection, worldPosition));
         }
     }
 }
