@@ -26,6 +26,9 @@ public class LevelResetManager : MonoBehaviour
     [SerializeField] private Material cloneMaterial2Body;
     [SerializeField] private Material cloneMaterial2Rim;
 
+    [Header("Exit")]
+    [SerializeField] private LevelExit levelExit;
+
     [Header("UI")]
     [SerializeField] private GameObject endTurnButton;
 
@@ -90,6 +93,11 @@ public class LevelResetManager : MonoBehaviour
     {
         isResetting = true;
 
+        if (levelExit != null)
+        {
+            levelExit.SetActive(false);
+        }
+
         if (inputHandler != null)
         {
             inputHandler.SetInputEnabled(false);
@@ -137,6 +145,11 @@ public class LevelResetManager : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.1f);
+
+        if (levelExit != null)
+        {
+            levelExit.SetActive(true);
+        }
 
         StartTurn();
         isResetting = false;
