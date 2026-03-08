@@ -31,12 +31,14 @@ public class LevelResetManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private GameObject endTurnButton;
+    [SerializeField] private CloneCounterUI cloneCounterUI;
 
     private int currentTurn = 1;
     private readonly List<List<MovementFrame>> allRecordings = new List<List<MovementFrame>>();
     private readonly List<CloneController> activeClones = new List<CloneController>();
     private Vector3 playerStart;
     private bool isResetting;
+    private bool hasWarnedMissingCloneCounterUI;
 
     private void Awake()
     {
@@ -176,6 +178,7 @@ public class LevelResetManager : MonoBehaviour
             }
         }
 
+        UpdateCloneUI();
         Debug.Log($"[LevelResetManager] Turn {currentTurn} started.");
     }
 
@@ -235,5 +238,22 @@ public class LevelResetManager : MonoBehaviour
 
         button.onClick.RemoveListener(EndTurn);
         button.onClick.AddListener(EndTurn);
+    }
+
+    private void UpdateCloneUI()
+    {
+        if (cloneCounterUI == null)
+        {
+            if (!hasWarnedMissingCloneCounterUI)
+            {
+                Debug.LogWarning("[LevelResetManager] cloneCounterUI is not assigned.");
+                hasWarnedMissingCloneCounterUI = true;
+            }
+
+            return;
+        }
+
+        int maxTurnsForUi = levelConfig != null ? levelConfig.maxTurns : 0;
+        cloneCounterUI.UpdateCloneDisplay(currentTurn, maxTurnsForUi);
     }
 }

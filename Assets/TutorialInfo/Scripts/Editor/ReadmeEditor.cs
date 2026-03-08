@@ -13,6 +13,7 @@ public class ReadmeEditor : Editor
     static string s_ShowedReadmeSessionStateName = "ReadmeEditor.showedReadme";
     
     static string s_ReadmeSourceDirectory = "Assets/TutorialInfo";
+    const bool k_AutoLoadTutorialLayout = false;
 
     const float k_Space = 16f;
 
@@ -58,20 +59,36 @@ public class ReadmeEditor : Editor
             var readme = SelectReadme();
             SessionState.SetBool(s_ShowedReadmeSessionStateName, true);
 
-            if (readme && !readme.loadedLayout)
+            if (k_AutoLoadTutorialLayout && readme && !readme.loadedLayout)
             {
-                LoadLayout();
+                TryLoadLayout();
                 readme.loadedLayout = true;
+                EditorUtility.SetDirty(readme);
+                AssetDatabase.SaveAssets();
             }
         }
     }
 
-    static void LoadLayout()
+    static void TryLoadLayout()
     {
-        var assembly = typeof(EditorApplication).Assembly;
-        var windowLayoutType = assembly.GetType("UnityEditor.WindowLayout", true);
-        var method = windowLayoutType.GetMethod("LoadWindowLayout", BindingFlags.Public | BindingFlags.Static);
-        method.Invoke(null, new object[] { Path.Combine(Application.dataPath, "TutorialInfo/Layout.wlt"), false });
+        try
+        {
+            var layoutPath = Path.Combine(Application.dataPath, "TutorialInfo/Layout.wlt");
+            if (!File.Exists(layoutPath))
+                return;
+
+            var assembly = typeof(EditorApplication).Assembly;
+            var windowLayoutType = assembly.GetType("UnityEditor.WindowLayout", true);
+            var method = windowLayoutType.GetMethod("LoadWindowLayout", BindingFlags.Public | BindingFlags.Static);
+            if (method == null)
+                return;
+
+            method.Invoke(null, new object[] { layoutPath, false });
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"[ReadmeEditor] Failed to load tutorial layout: {ex.Message}");
+        }
     }
 
     static Readme SelectReadme()
