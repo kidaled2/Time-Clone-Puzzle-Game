@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5391907024267809811
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3963668015182400199}
+  - component: {fileID: 7041025758383531446}
+  m_Layer: 0
+  m_Name: LevelResetManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3963668015182400199
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5391907024267809811}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7041025758383531446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5391907024267809811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9eeeb145b31ac7a48a7b8e6a0dd66768, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelConfig: {fileID: 0}
+  playerStartPosition: {fileID: 0}
+  player: {fileID: 0}
+  inputHandler: {fileID: 0}
+  recorder: {fileID: 0}
+  clonePrefab: {fileID: 5362923821190912875, guid: 104117484c737634db378458f7ceadc7, type: 3}
+  allPlates: []
+  allDoors: []
+  cloneMaterial1Body: {fileID: 2100000, guid: db24d474ed256c9419305a4e2e2d458f, type: 2}
+  cloneMaterial1Rim: {fileID: 2100000, guid: 78d8ce1856e7ac94db3ad68946fbef9d, type: 2}
+  cloneMaterial2Body: {fileID: 2100000, guid: b83561ce5b51a88478253e4cdc0ca607, type: 2}
+  cloneMaterial2Rim: {fileID: 2100000, guid: 560a7a1be96e5924ca5e76525375a805, type: 2}
+  levelExit: {fileID: 0}
+  endTurnButton: {fileID: 0}
