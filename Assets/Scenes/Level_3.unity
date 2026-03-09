@@ -5321,6 +5321,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 722742698974357727, guid: 36ba70d6ab4272e4685191fb5c76dece, type: 3}
+      propertyPath: plateId
+      value: Plate3_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 722742698974357727, guid: 36ba70d6ab4272e4685191fb5c76dece, type: 3}
       propertyPath: pairedDoor
       value: 
       objectReference: {fileID: 1632146619}
