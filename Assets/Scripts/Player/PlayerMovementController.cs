@@ -10,9 +10,6 @@ namespace TimeClone.Player
 {
     public sealed class PlayerMovementController : MonoBehaviour, IActorTag
     {
-        private static readonly Vector3 IsoForward = new Vector3(-1f, 0f, 1f);
-        private static readonly Vector3 IsoRight = new Vector3(1f, 0f, 1f);
-
         [Header("References")]
         [SerializeField] private PlayerInputHandler inputHandler;
         [SerializeField] private Transform visualTransform;
@@ -27,17 +24,15 @@ namespace TimeClone.Player
         [SerializeField] private LayerMask wallLayerMask;
         [SerializeField] private Vector3 obstacleCheckHalfExtents = new Vector3(0.35f, 0.5f, 0.35f);
         [SerializeField, Min(0f)] private float obstacleCheckVerticalOffset = 0.5f;
+        [SerializeField] private LayerMask groundLayerMask;
+        [SerializeField] private float groundFloorY = 0.5f;
+        [SerializeField] private float upperFloorY = 2.5f;
+        [SerializeField] private float upperFloorThresholdY = 1.5f;
 
         [Header("Blocked Feedback")]
         [SerializeField] private bool playBlockedBump = true;
         [SerializeField, Min(0f)] private float bumpDistance = 0.08f;
         [SerializeField, Min(0.01f)] private float bumpDuration = 0.1f;
-
-        [Header("Debug Grid")]
-        [SerializeField] private bool drawGridGizmo = true;
-        [SerializeField, Min(1)] private int gridGizmoRadius = 5;
-        [SerializeField] private Color gridGizmoColor = new Color(0.2f, 0.8f, 1f, 0.65f);
-        [SerializeField, Min(0f)] private float gridGizmoYOffset = 0.02f;
 
         private bool isMoving;
         private Coroutine moveRoutine;
@@ -45,7 +40,7 @@ namespace TimeClone.Player
         private Rigidbody rb;
 
         public string ActorId => "Player";
-        public event Action<Vector2> OnMoveConfirmed;
+        public event Action<Vector2, Vector3> OnMoveConfirmed;
 
 #if DOTWEEN
         private Tween movementTween;
@@ -69,6 +64,7 @@ namespace TimeClone.Player
 
             rb = GetComponent<Rigidbody>();
             TryAssignWallLayerIfUnset();
+            TryAssignGroundLayerIfUnset();
         }
 
         private void OnEnable()
@@ -133,11 +129,23 @@ namespace TimeClone.Player
                 return;
             }
 
-            Vector3 targetPosition = GetCurrentPosition() + (worldDirection * gridStepDistance);
+            Vector3 currentPosition = GetCurrentPosition();
+            Vector3 targetPosition = currentPosition + (worldDirection * gridStepDistance);
             targetPosition = new Vector3(
                 Mathf.Round(targetPosition.x),
-                GetCurrentPosition().y,
+                currentPosition.y,
                 Mathf.Round(targetPosition.z));
+
+            RampTile ramp = GetRampAtCurrentPosition(inputDirection);
+            if (ramp != null)
+            {
+                targetPosition.y = ramp.GetTargetY(inputDirection);
+            }
+            else
+            {
+                targetPosition.y = GetFloorYAtTarget(new Vector3(targetPosition.x, 0f, targetPosition.z), currentPosition.y);
+            }
+
             if (IsBlocked(targetPosition))
             {
                 TryPlayBlockedBump(worldDirection);
@@ -149,19 +157,10 @@ namespace TimeClone.Player
                 StopCoroutine(moveRoutine);
             }
 
-            OnMoveConfirmed?.Invoke(inputDirection);
+            OnMoveConfirmed?.Invoke(inputDirection, targetPosition);
             StartMovement(targetPosition, worldDirection);
         }
 
-        private void OnDrawGizmosSelected()
-        {
-            if (!drawGridGizmo || gridGizmoRadius < 1)
-            {
-                return;
-            }
-
-            DrawGridGizmo();
-        }
 
         private void StartMovement(Vector3 targetPosition, Vector3 worldDirection)
         {
@@ -182,7 +181,7 @@ namespace TimeClone.Player
             {
                 movementTween = rb
                     .DOMove(targetPosition, moveDuration)
-                    .SetEase(Ease.Linear)
+                    .SetEase(Ease.InOutSine)
                     .SetUpdate(useUnscaledTime)
                     .OnComplete(() =>
                     {
@@ -196,7 +195,7 @@ namespace TimeClone.Player
             {
                 movementTween = transform
                     .DOMove(targetPosition, moveDuration)
-                    .SetEase(Ease.Linear)
+                    .SetEase(Ease.InOutSine)
                     .SetUpdate(useUnscaledTime)
                     .OnComplete(() =>
                     {
@@ -218,11 +217,17 @@ namespace TimeClone.Player
             Quaternion targetRotation = Quaternion.LookRotation(worldDirection, Vector3.up);
             FaceDirection(worldDirection);
 
-            while ((GetCurrentPosition() - targetPosition).sqrMagnitude > 0.0001f)
+            float elapsed = 0f;
+            float duration = gridStepDistance / movementSpeed;
+            Vector3 startPosition = GetCurrentPosition();
+
+            while (elapsed < duration)
             {
                 float deltaTime = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
-                float stepDistance = movementSpeed * deltaTime;
-                Vector3 nextPosition = Vector3.MoveTowards(GetCurrentPosition(), targetPosition, stepDistance);
+                elapsed += deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float smoothT = Mathf.SmoothStep(0f, 1f, t);
+                Vector3 nextPosition = Vector3.Lerp(startPosition, targetPosition, smoothT);
                 MoveToPosition(nextPosition);
                 FaceDirection(worldDirection);
 
@@ -269,6 +274,72 @@ namespace TimeClone.Player
                 .OnKill(() => rotationTween = null);
         }
 #endif
+
+        /// <summary>
+        /// Checks if there is a usable RampTile at the actor's CURRENT position.
+        /// </summary>
+        private RampTile GetRampAtCurrentPosition(Vector2 inputDirection)
+        {
+            Vector3 checkCenter = GetCurrentPosition() + (Vector3.up * 0.2f);
+            Collider[] hits = Physics.OverlapBox(
+                checkCenter,
+                new Vector3(0.4f, 0.3f, 0.4f),
+                Quaternion.identity,
+                ~0,
+                QueryTriggerInteraction.Collide);
+
+            for (int i = 0; i < hits.Length; i++)
+            {
+                RampTile ramp = hits[i].GetComponent<RampTile>();
+                if (ramp == null)
+                {
+                    ramp = hits[i].GetComponentInParent<RampTile>();
+                }
+
+                if (ramp != null && ramp.CanUse(inputDirection))
+                {
+                    return ramp;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// When on upper floor, checks if there is an upper tile at the target x/z.
+        /// If not, the actor drops to ground floor.
+        /// </summary>
+        private float GetFloorYAtTarget(Vector3 targetXZ, float currentY)
+        {
+            if (currentY >= upperFloorThresholdY)
+            {
+                bool hasUpperTile = Physics.CheckBox(
+                    new Vector3(targetXZ.x, (upperFloorY - groundFloorY) + 0.1f, targetXZ.z),
+                    new Vector3(0.4f, 0.15f, 0.4f),
+                    Quaternion.identity,
+                    groundLayerMask,
+                    QueryTriggerInteraction.Ignore);
+
+                if (hasUpperTile)
+                {
+                    return upperFloorY;
+                }
+
+                bool hasGroundTile = Physics.CheckBox(
+                    new Vector3(targetXZ.x, 0.1f, targetXZ.z),
+                    new Vector3(0.4f, 0.15f, 0.4f),
+                    Quaternion.identity,
+                    groundLayerMask,
+                    QueryTriggerInteraction.Ignore);
+
+                if (hasGroundTile)
+                {
+                    return groundFloorY;
+                }
+            }
+
+            return currentY;
+        }
 
         private bool IsBlocked(Vector3 targetPosition)
         {
@@ -442,46 +513,6 @@ namespace TimeClone.Player
             }
         }
 
-        private void DrawGridGizmo()
-        {
-            float step = Mathf.Max(0.01f, gridStepDistance);
-            int radius = Mathf.Max(1, gridGizmoRadius);
-            Vector3 axisForward = IsoForward.normalized * step;
-            Vector3 axisRight = IsoRight.normalized * step;
-            Vector3 origin = GetSnappedGridOrigin(step) + (Vector3.up * gridGizmoYOffset);
-
-            Gizmos.color = gridGizmoColor;
-
-            for (int i = -radius; i <= radius; i++)
-            {
-                Vector3 start = origin + (axisForward * i) - (axisRight * radius);
-                Vector3 end = origin + (axisForward * i) + (axisRight * radius);
-                Gizmos.DrawLine(start, end);
-            }
-
-            for (int i = -radius; i <= radius; i++)
-            {
-                Vector3 start = origin + (axisRight * i) - (axisForward * radius);
-                Vector3 end = origin + (axisRight * i) + (axisForward * radius);
-                Gizmos.DrawLine(start, end);
-            }
-
-            Gizmos.DrawWireSphere(origin, step * 0.1f);
-        }
-
-        private Vector3 GetSnappedGridOrigin(float step)
-        {
-            Vector3 forwardAxis = IsoForward.normalized;
-            Vector3 rightAxis = IsoRight.normalized;
-            Vector3 position = transform.position;
-
-            float forwardCoord = Mathf.Round(Vector3.Dot(position, forwardAxis) / step) * step;
-            float rightCoord = Mathf.Round(Vector3.Dot(position, rightAxis) / step) * step;
-
-            Vector3 snapped = (forwardAxis * forwardCoord) + (rightAxis * rightCoord);
-            snapped.y = transform.position.y;
-            return snapped;
-        }
 
         private void TryAssignWallLayerIfUnset()
         {
@@ -496,5 +527,25 @@ namespace TimeClone.Player
                 wallLayerMask = 1 << wallLayer;
             }
         }
+
+        private void TryAssignGroundLayerIfUnset()
+        {
+            if (groundLayerMask.value != 0)
+            {
+                return;
+            }
+
+            int groundLayer = LayerMask.NameToLayer("Ground");
+            if (groundLayer >= 0)
+            {
+                groundLayerMask = 1 << groundLayer;
+            }
+        }
     }
 }
+
+
+
+
+
+

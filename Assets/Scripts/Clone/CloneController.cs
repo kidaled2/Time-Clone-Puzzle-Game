@@ -10,6 +10,10 @@ public class CloneController : MonoBehaviour, IActorTag
     [SerializeField] private LayerMask wallLayerMask;
     [SerializeField] private Vector3 obstacleCheckHalfExtents = new Vector3(0.35f, 0.5f, 0.35f);
     [SerializeField, Min(0f)] private float obstacleCheckVerticalOffset = 0.5f;
+    [SerializeField] private LayerMask groundLayerMask;
+    [SerializeField] private float groundFloorY = 0.5f;
+    [SerializeField] private float upperFloorY = 2f;
+    [SerializeField] private float upperFloorThresholdY = 1.5f;
 
     private string actorId = "Clone_1";
     private List<MovementFrame> frames;
@@ -21,6 +25,7 @@ public class CloneController : MonoBehaviour, IActorTag
     private void Awake()
     {
         TryAssignWallLayerIfUnset();
+        TryAssignGroundLayerIfUnset();
     }
 
     /// <summary>
@@ -86,10 +91,11 @@ public class CloneController : MonoBehaviour, IActorTag
                 continue;
             }
 
+            Vector3 currentPosition = transform.position;
             Vector3 target = new Vector3(
-                Mathf.Round(transform.position.x + isoDirection.x),
-                transform.position.y,
-                Mathf.Round(transform.position.z + isoDirection.z));
+                Mathf.Round(currentPosition.x + isoDirection.x),
+                frame.worldPosition.y,
+                Mathf.Round(currentPosition.z + isoDirection.z));
 
             if (IsBlocked(target))
             {
@@ -118,7 +124,9 @@ public class CloneController : MonoBehaviour, IActorTag
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            transform.position = Vector3.Lerp(start, target, elapsed / duration);
+            float t = Mathf.Clamp01(elapsed / duration);
+            float smoothT = Mathf.SmoothStep(0f, 1f, t);
+            transform.position = Vector3.Lerp(start, target, smoothT);
             yield return null;
         }
 
@@ -132,6 +140,70 @@ public class CloneController : MonoBehaviour, IActorTag
         if (input == Vector2.left) return new Vector3(-1f, 0f, 0f);
         if (input == Vector2.right) return new Vector3(1f, 0f, 0f);
         return Vector3.zero;
+    }
+
+    /// <summary>
+    /// Checks if there is a RampTile at the given position and input direction.
+    /// Returns the ramp component if found and usable, null otherwise.
+    /// </summary>
+    private RampTile GetRampAt(Vector3 position, Vector2 inputDirection)
+    {
+        Collider[] hits = Physics.OverlapBox(
+            position + (Vector3.up * 0.1f),
+            new Vector3(0.4f, 0.3f, 0.4f),
+            Quaternion.identity,
+            ~0,
+            QueryTriggerInteraction.Collide);
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            RampTile ramp = hits[i].GetComponent<RampTile>();
+            if (ramp == null)
+            {
+                ramp = hits[i].GetComponentInParent<RampTile>();
+            }
+
+            if (ramp != null && ramp.CanUse(inputDirection))
+            {
+                return ramp;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Checks available floor tiles at target X/Z and resolves the correct target Y level.
+    /// </summary>
+    private float GetTargetFloorY(Vector3 targetXZ)
+    {
+        Vector3 upperCheck = new Vector3(targetXZ.x, upperFloorY + 0.1f, targetXZ.z);
+        bool hasUpperTile = Physics.CheckBox(
+            upperCheck,
+            new Vector3(0.4f, 0.2f, 0.4f),
+            Quaternion.identity,
+            groundLayerMask,
+            QueryTriggerInteraction.Ignore);
+
+        if (hasUpperTile && transform.position.y >= upperFloorThresholdY)
+        {
+            return upperFloorY;
+        }
+
+        Vector3 groundCheck = new Vector3(targetXZ.x, 0.1f, targetXZ.z);
+        bool hasGroundTile = Physics.CheckBox(
+            groundCheck,
+            new Vector3(0.4f, 0.2f, 0.4f),
+            Quaternion.identity,
+            groundLayerMask,
+            QueryTriggerInteraction.Ignore);
+
+        if (hasGroundTile)
+        {
+            return groundFloorY;
+        }
+
+        return transform.position.y;
     }
 
     private bool IsBlocked(Vector3 targetPosition)
@@ -158,4 +230,22 @@ public class CloneController : MonoBehaviour, IActorTag
             wallLayerMask = 1 << wallLayer;
         }
     }
+
+    private void TryAssignGroundLayerIfUnset()
+    {
+        if (groundLayerMask.value != 0)
+        {
+            return;
+        }
+
+        int groundLayer = LayerMask.NameToLayer("Ground");
+        if (groundLayer >= 0)
+        {
+            groundLayerMask = 1 << groundLayer;
+        }
+    }
 }
+
+
+
+

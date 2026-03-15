@@ -110,15 +110,15 @@ namespace TimeClone.Recording
             return new List<MovementFrame>(recordedFrames);
         }
 
-        private void RecordFrame(Vector2 inputDirection)
+        private void RecordFrame(Vector2 inputDirection, Vector3 targetPosition)
         {
             if (!isRecording)
             {
                 return;
             }
 
-            Vector3 worldPosition = trackedTransform != null ? trackedTransform.position : transform.position;
-            recordedFrames.Add(new MovementFrame(Time.time - recordingStartTime, inputDirection, worldPosition));
+            recordedFrames.Add(new MovementFrame(Time.time - recordingStartTime, inputDirection, targetPosition));
         }
     }
 }
+
