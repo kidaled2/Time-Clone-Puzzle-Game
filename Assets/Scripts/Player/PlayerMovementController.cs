@@ -26,8 +26,12 @@ namespace TimeClone.Player
         [SerializeField, Min(0f)] private float obstacleCheckVerticalOffset = 0.5f;
         [SerializeField] private LayerMask groundLayerMask;
         [SerializeField] private float groundFloorY = 0.5f;
-        [SerializeField] private float upperFloorY = 2.5f;
+        [SerializeField] private float upperFloorY = 1.6f;
         [SerializeField] private float upperFloorThresholdY = 1.5f;
+
+        [Header("Ramp Stand Correction")]
+        [SerializeField, Min(0.01f)] private float rampMountDuration = 0.2f;
+
 
         [Header("Blocked Feedback")]
         [SerializeField] private bool playBlockedBump = true;
@@ -37,6 +41,8 @@ namespace TimeClone.Player
         private bool isMoving;
         private Coroutine moveRoutine;
         private Coroutine bumpRoutine;
+        private Coroutine rampCorrectionRoutine;
+
         private Rigidbody rb;
 
         public string ActorId => "Player";
@@ -84,6 +90,7 @@ namespace TimeClone.Player
 
             StopMovement();
             StopBump();
+            StopRampCorrection();
             isMoving = false;
         }
 
@@ -111,6 +118,66 @@ namespace TimeClone.Player
             }
         }
 
+        
+        /// <summary>
+        /// Starts a smooth root-height correction when entering a ramp tile.
+        /// </summary>
+        public void OnEnterRamp(float rampSurfaceY)
+        {
+            StopRampCorrection();
+            rampCorrectionRoutine = StartCoroutine(SmoothYCorrection(rampSurfaceY, rampMountDuration, false));
+        }
+
+        /// <summary>
+        /// Starts a smooth root-height correction when leaving a ramp tile toward ground level.
+        /// </summary>
+        public void OnExitRamp(float entryY)
+        {
+            StopRampCorrection();
+            rampCorrectionRoutine = StartCoroutine(SmoothYCorrection(entryY, rampMountDuration, true));
+        }
+
+        /// <summary>
+        /// Stops any active ramp correction and snaps the player root back to ground height.
+        /// </summary>
+        public void ResetRampCorrection()
+        {
+            StopRampCorrection();
+
+            Vector3 position = GetCurrentPosition();
+            MoveToPosition(new Vector3(position.x, groundFloorY, position.z));
+        }
+
+        /// <summary>
+        /// Stops all active movement-related coroutines and clears the moving state.
+        /// </summary>
+        public void StopAllPlayerCoroutines()
+        {
+            StopMovement();
+            StopBump();
+            StopRampCorrection();
+            isMoving = false;
+        }
+
+        /// <summary>
+        /// Teleports the player to the given position and synchronizes both transform and rigidbody state.
+        /// </summary>
+        public void TeleportTo(Vector3 position)
+        {
+            StopAllPlayerCoroutines();
+
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.position = position;
+                rb.rotation = Quaternion.identity;
+            }
+
+            transform.position = position;
+            transform.rotation = Quaternion.identity;
+        }
+
         private void HandleMoveInput(Vector2 inputDirection)
         {
             if (isMoving)
@@ -136,10 +203,19 @@ namespace TimeClone.Player
                 currentPosition.y,
                 Mathf.Round(targetPosition.z));
 
-            RampTile ramp = GetRampAtCurrentPosition(inputDirection);
-            if (ramp != null)
+            RampTile currentRamp = GetRampAtPosition(currentPosition);
+            RampTile targetRamp = GetRampAtPosition(targetPosition);
+            if (currentRamp != null && currentRamp.CanUse(inputDirection))
             {
-                targetPosition.y = ramp.GetTargetY(inputDirection);
+                targetPosition.y = currentRamp.ExitY;
+            }
+            else if (currentRamp != null)
+            {
+                targetPosition.y = currentRamp.EntryY;
+            }
+            else if (targetRamp != null)
+            {
+                targetPosition.y = targetRamp.RampSurfaceY;
             }
             else
             {
@@ -278,9 +354,9 @@ namespace TimeClone.Player
         /// <summary>
         /// Checks if there is a usable RampTile at the actor's CURRENT position.
         /// </summary>
-        private RampTile GetRampAtCurrentPosition(Vector2 inputDirection)
+        private RampTile GetRampAtPosition(Vector3 position)
         {
-            Vector3 checkCenter = GetCurrentPosition() + (Vector3.up * 0.2f);
+            Vector3 checkCenter = new Vector3(Mathf.Round(position.x), groundFloorY, Mathf.Round(position.z)) + (Vector3.up * 0.2f);
             Collider[] hits = Physics.OverlapBox(
                 checkCenter,
                 new Vector3(0.4f, 0.3f, 0.4f),
@@ -296,10 +372,24 @@ namespace TimeClone.Player
                     ramp = hits[i].GetComponentInParent<RampTile>();
                 }
 
-                if (ramp != null && ramp.CanUse(inputDirection))
+                if (ramp != null)
                 {
                     return ramp;
                 }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if there is a usable RampTile at the actor's CURRENT position.
+        /// </summary>
+        private RampTile GetRampAtCurrentPosition(Vector2 inputDirection)
+        {
+            RampTile ramp = GetRampAtPosition(GetCurrentPosition());
+            if (ramp != null && ramp.CanUse(inputDirection))
+            {
+                return ramp;
             }
 
             return null;
@@ -514,6 +604,53 @@ namespace TimeClone.Player
         }
 
 
+        
+        private void StopRampCorrection()
+        {
+            if (rampCorrectionRoutine != null)
+            {
+                StopCoroutine(rampCorrectionRoutine);
+                rampCorrectionRoutine = null;
+            }
+        }
+
+        private IEnumerator SmoothYCorrection(float targetY, float duration, bool skipIfAscending)
+        {
+            while (isMoving)
+            {
+                yield return null;
+            }
+
+            float startY = GetCurrentPosition().y;
+            if (skipIfAscending && startY >= upperFloorThresholdY)
+            {
+                rampCorrectionRoutine = null;
+                yield break;
+            }
+
+            if (Mathf.Approximately(startY, targetY))
+            {
+                rampCorrectionRoutine = null;
+                yield break;
+            }
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                float deltaTime = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+                elapsed += deltaTime;
+                float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+
+                Vector3 position = GetCurrentPosition();
+                MoveToPosition(new Vector3(position.x, Mathf.Lerp(startY, targetY, t), position.z));
+                yield return null;
+            }
+
+            Vector3 finalPosition = GetCurrentPosition();
+            MoveToPosition(new Vector3(finalPosition.x, targetY, finalPosition.z));
+            rampCorrectionRoutine = null;
+        }
+
         private void TryAssignWallLayerIfUnset()
         {
             if (wallLayerMask.value != 0)
@@ -543,6 +680,11 @@ namespace TimeClone.Player
         }
     }
 }
+
+
+
+
+
 
 
 

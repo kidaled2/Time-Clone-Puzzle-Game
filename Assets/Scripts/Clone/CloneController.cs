@@ -91,11 +91,7 @@ public class CloneController : MonoBehaviour, IActorTag
                 continue;
             }
 
-            Vector3 currentPosition = transform.position;
-            Vector3 target = new Vector3(
-                Mathf.Round(currentPosition.x + isoDirection.x),
-                frame.worldPosition.y,
-                Mathf.Round(currentPosition.z + isoDirection.z));
+            Vector3 target = frame.worldPosition;
 
             if (IsBlocked(target))
             {
@@ -245,6 +241,7 @@ public class CloneController : MonoBehaviour, IActorTag
         }
     }
 }
+
 
 
 

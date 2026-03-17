@@ -1293,6 +1293,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 181985663}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!134 &184020928
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!1 &185929859
 GameObject:
   m_ObjectHideFlags: 0
@@ -8923,19 +8936,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 970198307}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!134 &979858840
-PhysicsMaterial:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: ' (Instance)'
-  serializedVersion: 2
-  m_DynamicFriction: 0.6
-  m_StaticFriction: 0.6
-  m_Bounciness: 0
-  m_FrictionCombine: 0
-  m_BounceCombine: 0
 --- !u!1 &1012317692
 GameObject:
   m_ObjectHideFlags: 0
@@ -9554,6 +9554,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ramp
       objectReference: {fileID: 0}
+    - target: {fileID: 4190104431785130658, guid: 57a81ace67f60b24692a7ac3b87e646f, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4190104431785130658, guid: 57a81ace67f60b24692a7ac3b87e646f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4190104431785130658, guid: 57a81ace67f60b24692a7ac3b87e646f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6625630011524764690, guid: 57a81ace67f60b24692a7ac3b87e646f, type: 3}
+      propertyPath: m_Size.y
+      value: 1.261236
+      objectReference: {fileID: 0}
+    - target: {fileID: 6625630011524764690, guid: 57a81ace67f60b24692a7ac3b87e646f, type: 3}
+      propertyPath: m_Center.y
+      value: 0.13061799
+      objectReference: {fileID: 0}
+    - target: {fileID: 6625630011524764690, guid: 57a81ace67f60b24692a7ac3b87e646f, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 1596812379}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9740,6 +9764,7 @@ MonoBehaviour:
   groundFloorY: 0.5
   upperFloorY: 1.6
   upperFloorThresholdY: 1.5
+  rampMountDuration: 0.2
   playBlockedBump: 1
   bumpDistance: 0.08
   bumpDuration: 0.1
@@ -9777,7 +9802,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1211821977}
-  m_Material: {fileID: 979858840}
+  m_Material: {fileID: 1556769883}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -10493,6 +10518,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1490125178}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!134 &1556769883
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ' (Instance) (Instance) (Instance)'
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!1 &1580627208
 GameObject:
   m_ObjectHideFlags: 0
@@ -10601,6 +10639,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1580627208}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!134 &1596812379
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ' (Instance)'
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!114 &1626909357 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 722742698974357727, guid: 36ba70d6ab4272e4685191fb5c76dece, type: 3}
@@ -11521,6 +11572,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 826898238879771725, guid: 280bd48bd6834cc4d9d4fabc5ce9f12e, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 184020928}
     - target: {fileID: 8568457400656489065, guid: 280bd48bd6834cc4d9d4fabc5ce9f12e, type: 3}
       propertyPath: m_Name
       value: UpperFloorTile

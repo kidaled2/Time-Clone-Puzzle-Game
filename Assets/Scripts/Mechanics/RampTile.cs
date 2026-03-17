@@ -1,19 +1,26 @@
+using TimeClone.Player;
 using UnityEngine;
 
 public class RampTile : MonoBehaviour
 {
     [Header("Ramp Settings")]
     [Tooltip("Player's standing Y on the upper floor after using this ramp")]
-    [SerializeField] private float exitY = 2.5f;
+    [SerializeField] private float exitY = 1.6f;
 
     [Tooltip("Player's standing Y on the ground floor (base of ramp)")]
     [SerializeField] private float entryY = 0.5f;
+
+    [Tooltip("Player's standing Y while mounted on the ramp surface.")]
+    [SerializeField] private float rampSurfaceY = 1.0f;
+
 
     [Tooltip("Required input direction to ascend. Opposite direction descends.")]
     [SerializeField] private Vector2 ascendDirection = Vector2.up;
 
     public float ExitY => exitY;
     public float EntryY => entryY;
+    public float RampSurfaceY => rampSurfaceY;
+
 
     /// <summary>
     /// Returns true if this input direction uses the ramp (ascending or descending).
@@ -33,6 +40,60 @@ public class RampTile : MonoBehaviour
         return entryY;
     }
 
+
+    private void OnTriggerEnter(Collider other)
+    {
+        IActorTag actor = other.GetComponent<IActorTag>();
+        if (actor == null)
+        {
+            actor = other.GetComponentInParent<IActorTag>();
+        }
+
+        if (actor == null || actor.ActorId != "Player")
+        {
+            return;
+        }
+
+        PlayerMovementController movement = other.GetComponent<PlayerMovementController>();
+        if (movement == null)
+        {
+            movement = other.GetComponentInParent<PlayerMovementController>();
+        }
+
+        if (movement == null)
+        {
+            return;
+        }
+
+        movement.OnEnterRamp(rampSurfaceY);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        IActorTag actor = other.GetComponent<IActorTag>();
+        if (actor == null)
+        {
+            actor = other.GetComponentInParent<IActorTag>();
+        }
+
+        if (actor == null || actor.ActorId != "Player")
+        {
+            return;
+        }
+
+        PlayerMovementController movement = other.GetComponent<PlayerMovementController>();
+        if (movement == null)
+        {
+            movement = other.GetComponentInParent<PlayerMovementController>();
+        }
+
+        if (movement == null)
+        {
+            return;
+        }
+
+        movement.OnExitRamp(entryY);
+    }
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -45,3 +106,4 @@ public class RampTile : MonoBehaviour
     }
 #endif
 }
+

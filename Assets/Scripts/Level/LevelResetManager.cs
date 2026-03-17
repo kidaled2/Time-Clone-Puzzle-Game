@@ -135,9 +135,11 @@ public class LevelResetManager : MonoBehaviour
 
         if (player != null)
         {
-            player.transform.position = playerStart;
-            player.transform.rotation = Quaternion.identity;
+            player.TeleportTo(playerStart);
+            Physics.SyncTransforms();
         }
+
+        yield return null;
 
         currentTurn++;
 
@@ -257,3 +259,5 @@ public class LevelResetManager : MonoBehaviour
         cloneCounterUI.UpdateCloneDisplay(currentTurn, maxTurnsForUi);
     }
 }
+
+
