@@ -23,7 +23,7 @@ namespace TimeClone.Player
         [Header("Collision")]
         [SerializeField] private LayerMask wallLayerMask;
         [SerializeField] private Vector3 obstacleCheckHalfExtents = new Vector3(0.35f, 0.5f, 0.35f);
-        [SerializeField, Min(0f)] private float obstacleCheckVerticalOffset = 0.5f;
+        [SerializeField, Min(0f)] private float obstacleCheckVerticalOffset = 0.3f;
         [SerializeField] private LayerMask groundLayerMask;
         [SerializeField] private float groundFloorY = 0.5f;
         [SerializeField] private float upperFloorY = 1.6f;
@@ -680,6 +680,7 @@ namespace TimeClone.Player
         }
     }
 }
+
 
 
 

@@ -282,7 +282,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   obstacleCheckHalfExtents: {x: 0.35, y: 0.5, z: 0.35}
-  obstacleCheckVerticalOffset: 0.5
+  obstacleCheckVerticalOffset: 0.3
   playBlockedBump: 1
   bumpDistance: 0.08
   bumpDuration: 0.1
@@ -321,3 +321,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementController: {fileID: 0}
   trackedTransform: {fileID: 3260749532235586068}
+

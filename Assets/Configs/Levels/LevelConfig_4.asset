@@ -14,4 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelName: Level_4
   levelIndex: 4
-  maxTurns: 3
+  maxTurns: 2
+  nextSceneName: 
+  nextSceneIndex: -1
