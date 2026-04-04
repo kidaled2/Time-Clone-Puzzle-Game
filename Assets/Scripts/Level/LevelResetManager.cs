@@ -4,6 +4,7 @@ using TimeClone.Player;
 using TimeClone.Recording;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelResetManager : MonoBehaviour
@@ -33,6 +34,10 @@ public class LevelResetManager : MonoBehaviour
     [SerializeField] private GameObject endTurnButton;
     [SerializeField] private CloneCounterUI cloneCounterUI;
 
+    [Header("Timer")]
+    [SerializeField] private TurnTimer turnTimer;
+    [SerializeField] private TurnTimerUI turnTimerUI;
+
     private int currentTurn = 1;
     private readonly List<List<MovementFrame>> allRecordings = new List<List<MovementFrame>>();
     private readonly List<CloneController> activeClones = new List<CloneController>();
@@ -47,6 +52,19 @@ public class LevelResetManager : MonoBehaviour
             : (player != null ? player.transform.position : Vector3.zero);
 
         TryAutoBindEndTurnButton();
+
+        if (turnTimer != null)
+        {
+            turnTimer.OnTimerExpired += OnTurnTimerExpired;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (turnTimer != null)
+        {
+            turnTimer.OnTimerExpired -= OnTurnTimerExpired;
+        }
     }
 
     private void Start()
@@ -59,6 +77,11 @@ public class LevelResetManager : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
         {
             EndTurn();
+        }
+
+        if (turnTimer != null && turnTimer.IsRunning && turnTimerUI != null)
+        {
+            turnTimerUI.UpdateDisplay(turnTimer.TimeRemaining);
         }
     }
 
@@ -88,12 +111,27 @@ public class LevelResetManager : MonoBehaviour
             return;
         }
 
+        if (turnTimer != null)
+        {
+            turnTimer.StopTimer();
+        }
+
         StartCoroutine(ResetAndStartNextTurn());
     }
 
     private IEnumerator ResetAndStartNextTurn()
     {
         isResetting = true;
+
+        if (turnTimer != null)
+        {
+            turnTimer.StopTimer();
+        }
+
+        if (turnTimerUI != null)
+        {
+            turnTimerUI.Hide();
+        }
 
         if (levelExit != null)
         {
@@ -159,6 +197,47 @@ public class LevelResetManager : MonoBehaviour
         isResetting = false;
     }
 
+    private void OnTurnTimerExpired()
+    {
+        if (isResetting)
+        {
+            return;
+        }
+
+        isResetting = true;
+        Debug.Log("[LevelResetManager] Turn timer expired - reloading level.");
+
+        if (turnTimer != null)
+        {
+            turnTimer.StopTimer();
+        }
+
+        if (turnTimerUI != null)
+        {
+            turnTimerUI.Hide();
+        }
+
+        if (inputHandler != null)
+        {
+            inputHandler.SetInputEnabled(false);
+        }
+
+        if (player != null)
+        {
+            player.StopAllPlayerCoroutines();
+        }
+
+        Scene activeScene = SceneManager.GetActiveScene();
+        if (activeScene.buildIndex >= 0)
+        {
+            SceneManager.LoadScene(activeScene.buildIndex);
+        }
+        else
+        {
+            SceneManager.LoadScene(activeScene.path);
+        }
+    }
+
     private void StartTurn()
     {
         if (recorder != null)
@@ -177,6 +256,20 @@ public class LevelResetManager : MonoBehaviour
             if (activeClones[i] != null)
             {
                 activeClones[i].StartReplay();
+            }
+        }
+
+        if (turnTimer != null)
+        {
+            turnTimer.StartTimer();
+        }
+
+        if (turnTimerUI != null)
+        {
+            turnTimerUI.Show();
+            if (turnTimer != null)
+            {
+                turnTimerUI.UpdateDisplay(turnTimer.TimeRemaining);
             }
         }
 
@@ -259,5 +352,4 @@ public class LevelResetManager : MonoBehaviour
         cloneCounterUI.UpdateCloneDisplay(currentTurn, maxTurnsForUi);
     }
 }
-
 
