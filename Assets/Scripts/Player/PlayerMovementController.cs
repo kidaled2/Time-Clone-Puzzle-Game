@@ -222,7 +222,24 @@ namespace TimeClone.Player
                 targetPosition.y = GetFloorYAtTarget(new Vector3(targetPosition.x, 0f, targetPosition.z), currentPosition.y);
             }
 
-            if (IsBlocked(targetPosition))
+            PushableBox box = GetBoxAt(targetPosition);
+            if (box != null)
+            {
+                if (CanWalkAcrossBox(box))
+                {
+                    targetPosition.y = GetBoxTopStandingY(box);
+                }
+                else
+                {
+                    bool pushed = box.TryPush(worldDirection);
+                    if (!pushed)
+                    {
+                        TryPlayBlockedBump(worldDirection);
+                        return;
+                    }
+                }
+            }
+            else if (IsBlocked(targetPosition))
             {
                 TryPlayBlockedBump(worldDirection);
                 return;
@@ -235,6 +252,49 @@ namespace TimeClone.Player
 
             OnMoveConfirmed?.Invoke(inputDirection, targetPosition);
             StartMovement(targetPosition, worldDirection);
+        }
+
+        /// <summary>
+        /// Returns a PushableBox at the given world position, or null if none found.
+        /// </summary>
+        private PushableBox GetBoxAt(Vector3 position)
+        {
+            Vector3 checkCenter = new Vector3(
+                Mathf.Round(position.x),
+                groundFloorY + obstacleCheckVerticalOffset,
+                Mathf.Round(position.z));
+            Collider[] hits = Physics.OverlapBox(
+                checkCenter,
+                obstacleCheckHalfExtents,
+                Quaternion.identity,
+                ~0,
+                QueryTriggerInteraction.Ignore);
+
+            for (int i = 0; i < hits.Length; i++)
+            {
+                PushableBox box = hits[i].GetComponent<PushableBox>();
+                if (box == null)
+                {
+                    box = hits[i].GetComponentInParent<PushableBox>();
+                }
+
+                if (box != null)
+                {
+                    return box;
+                }
+            }
+
+            return null;
+        }
+
+        private bool CanWalkAcrossBox(PushableBox box)
+        {
+            return box != null && GetCurrentPosition().y >= upperFloorThresholdY;
+        }
+
+        private float GetBoxTopStandingY(PushableBox box)
+        {
+            return box.StandingY;
         }
 
 
@@ -403,6 +463,12 @@ namespace TimeClone.Player
         {
             if (currentY >= upperFloorThresholdY)
             {
+                PushableBox boxAtTarget = GetBoxAt(targetXZ);
+                if (boxAtTarget != null)
+                {
+                    return GetBoxTopStandingY(boxAtTarget);
+                }
+
                 bool hasUpperTile = Physics.CheckBox(
                     new Vector3(targetXZ.x, (upperFloorY - groundFloorY) + 0.1f, targetXZ.z),
                     new Vector3(0.4f, 0.15f, 0.4f),

@@ -21,6 +21,9 @@ public class LevelResetManager : MonoBehaviour
     [SerializeField] private List<PressurePlate> allPlates = new List<PressurePlate>();
     [SerializeField] private List<SlidingDoor> allDoors = new List<SlidingDoor>();
 
+    [Header("Boxes")]
+    [SerializeField] private List<PushableBox> allBoxes = new List<PushableBox>();
+
     [Header("Clone Materials")]
     [SerializeField] private Material cloneMaterial1Body;
     [SerializeField] private Material cloneMaterial1Rim;
@@ -51,6 +54,7 @@ public class LevelResetManager : MonoBehaviour
             ? playerStartPosition.position
             : (player != null ? player.transform.position : Vector3.zero);
 
+        SyncBoxReferences();
         TryAutoBindEndTurnButton();
 
         if (turnTimer != null)
@@ -122,6 +126,7 @@ public class LevelResetManager : MonoBehaviour
     private IEnumerator ResetAndStartNextTurn()
     {
         isResetting = true;
+        SyncBoxReferences();
 
         if (turnTimer != null)
         {
@@ -158,6 +163,14 @@ public class LevelResetManager : MonoBehaviour
             if (allDoors[i] != null)
             {
                 allDoors[i].ResetDoor();
+            }
+        }
+
+        for (int i = 0; i < allBoxes.Count; i++)
+        {
+            if (allBoxes[i] != null)
+            {
+                allBoxes[i].ResetBox();
             }
         }
 
@@ -350,6 +363,20 @@ public class LevelResetManager : MonoBehaviour
 
         int maxTurnsForUi = levelConfig != null ? levelConfig.maxTurns : 0;
         cloneCounterUI.UpdateCloneDisplay(currentTurn, maxTurnsForUi);
+    }
+
+    private void SyncBoxReferences()
+    {
+        allBoxes.RemoveAll(box => box == null);
+
+        PushableBox[] sceneBoxes = FindObjectsByType<PushableBox>(FindObjectsSortMode.None);
+        for (int i = 0; i < sceneBoxes.Length; i++)
+        {
+            if (!allBoxes.Contains(sceneBoxes[i]))
+            {
+                allBoxes.Add(sceneBoxes[i]);
+            }
+        }
     }
 }
 

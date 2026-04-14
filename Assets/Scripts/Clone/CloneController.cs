@@ -93,7 +93,19 @@ public class CloneController : MonoBehaviour, IActorTag
 
             Vector3 target = frame.worldPosition;
 
-            if (IsBlocked(target))
+            PushableBox box = GetBoxAt(target);
+            if (box != null)
+            {
+                if (!CanWalkAcrossBox(box))
+                {
+                    bool pushed = box.TryPush(isoDirection);
+                    if (!pushed)
+                    {
+                        continue;
+                    }
+                }
+            }
+            else if (IsBlocked(target))
             {
                 continue;
             }
@@ -136,6 +148,48 @@ public class CloneController : MonoBehaviour, IActorTag
         if (input == Vector2.left) return new Vector3(-1f, 0f, 0f);
         if (input == Vector2.right) return new Vector3(1f, 0f, 0f);
         return Vector3.zero;
+    }
+
+    private PushableBox GetBoxAt(Vector3 position)
+    {
+        Vector3 checkCenter = new Vector3(
+            Mathf.Round(position.x),
+            groundFloorY + obstacleCheckVerticalOffset,
+            Mathf.Round(position.z));
+        Collider[] hits = Physics.OverlapBox(
+            checkCenter,
+            obstacleCheckHalfExtents,
+            Quaternion.identity,
+            ~0,
+            QueryTriggerInteraction.Ignore);
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            PushableBox box = hits[i].GetComponent<PushableBox>();
+            if (box == null)
+            {
+                box = hits[i].GetComponentInParent<PushableBox>();
+            }
+
+            if (box != null)
+            {
+                return box;
+            }
+        }
+
+        return null;
+    }
+
+    private bool CanWalkAcrossBox(PushableBox box)
+    {
+        return box != null
+            && transform.position.y >= upperFloorThresholdY
+            && GetBoxTopStandingY(box) > groundFloorY;
+    }
+
+    private float GetBoxTopStandingY(PushableBox box)
+    {
+        return box.StandingY;
     }
 
     /// <summary>
