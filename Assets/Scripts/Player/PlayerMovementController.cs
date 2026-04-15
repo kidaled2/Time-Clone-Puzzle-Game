@@ -19,6 +19,9 @@ namespace TimeClone.Player
         [SerializeField, Min(0.01f)] private float movementSpeed = 8f;
         [SerializeField, Min(1f)] private float rotationSpeedDegreesPerSecond = 720f;
         [SerializeField] private bool useUnscaledTime = true;
+        [SerializeField] private AudioSource movementAudioSource;
+        [SerializeField] private AudioClip[] walkClips;
+        [SerializeField, Min(0f)] private float walkVolume = 1f;
 
         [Header("Collision")]
         [SerializeField] private LayerMask wallLayerMask;
@@ -44,6 +47,7 @@ namespace TimeClone.Player
         private Coroutine rampCorrectionRoutine;
 
         private Rigidbody rb;
+        private int lastWalkClipIndex = -1;
 
         public string ActorId => "Player";
         public event Action<Vector2, Vector3> OnMoveConfirmed;
@@ -71,6 +75,11 @@ namespace TimeClone.Player
             rb = GetComponent<Rigidbody>();
             TryAssignWallLayerIfUnset();
             TryAssignGroundLayerIfUnset();
+
+            if (movementAudioSource == null)
+            {
+                movementAudioSource = GetComponent<AudioSource>();
+            }
         }
 
         private void OnEnable()
@@ -91,6 +100,7 @@ namespace TimeClone.Player
             StopMovement();
             StopBump();
             StopRampCorrection();
+            StopMovementAudio();
             isMoving = false;
         }
 
@@ -165,6 +175,7 @@ namespace TimeClone.Player
         public void TeleportTo(Vector3 position)
         {
             StopAllPlayerCoroutines();
+            StopMovementAudio();
 
             if (rb != null)
             {
@@ -306,6 +317,7 @@ namespace TimeClone.Player
             }
 
             isMoving = true;
+            PlayWalkSound();
 
 #if DOTWEEN
             StopMovement();
@@ -742,6 +754,46 @@ namespace TimeClone.Player
             if (groundLayer >= 0)
             {
                 groundLayerMask = 1 << groundLayer;
+            }
+        }
+
+        private void PlayWalkSound()
+        {
+            AudioClip clip = GetNextWalkClip();
+            if (movementAudioSource == null || clip == null)
+            {
+                return;
+            }
+
+            movementAudioSource.PlayOneShot(clip, walkVolume);
+        }
+
+        private AudioClip GetNextWalkClip()
+        {
+            if (walkClips == null || walkClips.Length == 0)
+            {
+                return null;
+            }
+
+            int clipIndex = 0;
+            if (walkClips.Length > 1)
+            {
+                clipIndex = UnityEngine.Random.Range(0, walkClips.Length);
+                if (clipIndex == lastWalkClipIndex)
+                {
+                    clipIndex = (clipIndex + 1 + UnityEngine.Random.Range(0, walkClips.Length - 1)) % walkClips.Length;
+                }
+            }
+
+            lastWalkClipIndex = clipIndex;
+            return walkClips[clipIndex];
+        }
+
+        private void StopMovementAudio()
+        {
+            if (movementAudioSource != null)
+            {
+                movementAudioSource.Stop();
             }
         }
     }

@@ -187,6 +187,7 @@ GameObject:
   - component: {fileID: 8962285552751273786}
   - component: {fileID: 36085719184243231}
   - component: {fileID: 5050298452290379616}
+  - component: {fileID: 2718498772713468671}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -278,18 +279,30 @@ MonoBehaviour:
   movementSpeed: 50
   rotationSpeedDegreesPerSecond: 720
   useUnscaledTime: 1
+  movementAudioSource: {fileID: 2718498772713468671}
+  walkClips:
+  - {fileID: 8300000, guid: 178f44acacc89be4e924fb346c705ccc, type: 3}
+  - {fileID: 8300000, guid: 37661e1579328ca48b27ffc67924d8c8, type: 3}
+  - {fileID: 8300000, guid: 07ebea60b17debc45a58a4c251efbf38, type: 3}
+  - {fileID: 8300000, guid: f82be097d43b8d84ab4954ac47b8ce0e, type: 3}
+  - {fileID: 8300000, guid: c0e9ca58d00370643a91cd21bb6f6447, type: 3}
+  - {fileID: 8300000, guid: d339fbfd0c817ae4eb6d22501d1d0784, type: 3}
+  walkVolume: 1
   wallLayerMask:
     serializedVersion: 2
     m_Bits: 128
   obstacleCheckHalfExtents: {x: 0.35, y: 0.5, z: 0.35}
   obstacleCheckVerticalOffset: 0.3
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  groundFloorY: 0.5
+  upperFloorY: 1.6
+  upperFloorThresholdY: 1.5
+  rampMountDuration: 0.2
   playBlockedBump: 1
   bumpDistance: 0.08
   bumpDuration: 0.1
-  drawGridGizmo: 1
-  gridGizmoRadius: 5
-  gridGizmoColor: {r: 0.2, g: 0.8, b: 1, a: 0.65}
-  gridGizmoYOffset: 0.02
 --- !u!114 &36085719184243231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -321,4 +334,100 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementController: {fileID: 0}
   trackedTransform: {fileID: 3260749532235586068}
-
+--- !u!82 &2718498772713468671
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8478258636623888557}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

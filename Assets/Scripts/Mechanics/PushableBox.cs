@@ -9,9 +9,15 @@ public class PushableBox : MonoBehaviour
     [SerializeField] private Vector3 obstacleCheckHalfExtents = new Vector3(0.35f, 0.5f, 0.35f);
     [SerializeField] private float obstacleCheckVerticalOffset = 0.3f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip[] pushClips;
+    [SerializeField, Min(0f)] private float pushVolume = 1f;
+
     private Vector3 originPosition;
     private bool isMoving;
     private Coroutine moveRoutine;
+    private int lastPushClipIndex = -1;
 
     public float TopSurfaceY => transform.position.y + 0.5f;
     public float StandingY => transform.position.y + 1.0f;
@@ -26,6 +32,11 @@ public class PushableBox : MonoBehaviour
 
         originPosition = transform.position;
         TryAssignWallLayerIfUnset();
+
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
 
     /// <summary>
@@ -55,6 +66,7 @@ public class PushableBox : MonoBehaviour
         }
 
         moveRoutine = StartCoroutine(MoveRoutine(targetPosition));
+        PlayPushSound();
         return true;
     }
 
@@ -70,6 +82,7 @@ public class PushableBox : MonoBehaviour
         }
 
         isMoving = false;
+        StopPushAudio();
         transform.position = originPosition;
     }
 
@@ -117,6 +130,46 @@ public class PushableBox : MonoBehaviour
         if (wallLayer >= 0)
         {
             wallLayerMask = 1 << wallLayer;
+        }
+    }
+
+    private void PlayPushSound()
+    {
+        AudioClip clip = GetNextPushClip();
+        if (audioSource == null || clip == null)
+        {
+            return;
+        }
+
+        audioSource.PlayOneShot(clip, pushVolume);
+    }
+
+    private AudioClip GetNextPushClip()
+    {
+        if (pushClips == null || pushClips.Length == 0)
+        {
+            return null;
+        }
+
+        int clipIndex = 0;
+        if (pushClips.Length > 1)
+        {
+            clipIndex = Random.Range(0, pushClips.Length);
+            if (clipIndex == lastPushClipIndex)
+            {
+                clipIndex = (clipIndex + 1 + Random.Range(0, pushClips.Length - 1)) % pushClips.Length;
+            }
+        }
+
+        lastPushClipIndex = clipIndex;
+        return pushClips[clipIndex];
+    }
+
+    private void StopPushAudio()
+    {
+        if (audioSource != null)
+        {
+            audioSource.Stop();
         }
     }
 
