@@ -11,6 +11,12 @@ public class SlidingDoor : MonoBehaviour
     [SerializeField] private float slideDuration = 0.4f;
     [SerializeField] private float openOffset = 1.1f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip openClip;
+    [SerializeField] private AudioClip closeClip;
+    [SerializeField] private float audioVolume = 1f;
+
     private Vector3 leftClosed;
     private Vector3 rightClosed;
     private bool isOpen;
@@ -47,6 +53,11 @@ public class SlidingDoor : MonoBehaviour
             rightClosed = rightPanel.localPosition;
         }
 
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
         doorCollider = GetComponent<BoxCollider>();
 
         int wallLayer = LayerMask.NameToLayer("Wall");
@@ -76,6 +87,8 @@ public class SlidingDoor : MonoBehaviour
         {
             StopCoroutine(slideCoroutine);
         }
+
+        PlayClip(openClip);
 
         if (leftPanel == null || rightPanel == null)
         {
@@ -108,6 +121,8 @@ public class SlidingDoor : MonoBehaviour
             StopCoroutine(slideCoroutine);
         }
 
+        PlayClip(closeClip);
+
         if (leftPanel == null || rightPanel == null)
         {
             return;
@@ -138,6 +153,16 @@ public class SlidingDoor : MonoBehaviour
         lPanel.localPosition = lTarget;
         rPanel.localPosition = rTarget;
         slideCoroutine = null;
+    }
+
+    private void PlayClip(AudioClip clip)
+    {
+        if (audioSource == null || clip == null)
+        {
+            return;
+        }
+
+        audioSource.PlayOneShot(clip, audioVolume);
     }
 
     /// <summary>
