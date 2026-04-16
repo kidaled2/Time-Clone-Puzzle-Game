@@ -65,6 +65,11 @@ public class PushableBox : MonoBehaviour
             StopCoroutine(moveRoutine);
         }
 
+        if (VFXManager.Instance != null)
+        {
+            VFXManager.Instance.PlayBoxPush(transform.position);
+        }
+
         moveRoutine = StartCoroutine(MoveRoutine(targetPosition));
         PlayPushSound();
         return true;

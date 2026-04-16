@@ -83,6 +83,11 @@ public class SlidingDoor : MonoBehaviour
             doorCollider.enabled = false;
         }
 
+        if (VFXManager.Instance != null)
+        {
+            VFXManager.Instance.PlayDoorOpen(transform.position);
+        }
+
         if (slideCoroutine != null)
         {
             StopCoroutine(slideCoroutine);

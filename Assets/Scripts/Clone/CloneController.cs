@@ -7,6 +7,7 @@ public class CloneController : MonoBehaviour, IActorTag
 {
     [SerializeField] private MeshRenderer visualRenderer;
     [SerializeField] private MeshRenderer rimRenderer;
+    [SerializeField] private MeshRenderer[] additionalBodyRenderers;
     [SerializeField] private LayerMask wallLayerMask;
     [SerializeField] private Vector3 obstacleCheckHalfExtents = new Vector3(0.35f, 0.5f, 0.35f);
     [SerializeField, Min(0f)] private float obstacleCheckVerticalOffset = 0.3f;
@@ -37,9 +38,23 @@ public class CloneController : MonoBehaviour, IActorTag
         this.frames = frames;
         this.moveSpeed = Mathf.Max(0.01f, moveSpeed);
 
-        if (visualRenderer != null && bodyMat != null)
+        if (bodyMat != null)
         {
-            visualRenderer.material = bodyMat;
+            if (visualRenderer != null)
+            {
+                visualRenderer.material = bodyMat;
+            }
+
+            if (additionalBodyRenderers != null)
+            {
+                for (int i = 0; i < additionalBodyRenderers.Length; i++)
+                {
+                    if (additionalBodyRenderers[i] != null)
+                    {
+                        additionalBodyRenderers[i].material = bodyMat;
+                    }
+                }
+            }
         }
 
         if (rimRenderer != null && rimMat != null)

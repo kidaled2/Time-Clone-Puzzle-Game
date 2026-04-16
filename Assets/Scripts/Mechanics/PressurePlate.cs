@@ -64,6 +64,11 @@ public class PressurePlate : MonoBehaviour
 
         IsActivated = shouldBeActive;
 
+        if (IsActivated && VFXManager.Instance != null)
+        {
+            VFXManager.Instance.PlayPressurePlateActivate(transform.position);
+        }
+
         if (pairedDoor != null)
         {
             if (IsActivated)

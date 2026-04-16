@@ -3145,6 +3145,56 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1076497900}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1097782297
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1097782299}
+  - component: {fileID: 1097782298}
+  m_Layer: 0
+  m_Name: VFXManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1097782298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1097782297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfa309cedc9c45c40a6475c639f79fd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxPressurePlateActivate: {fileID: 1375768448122574650, guid: 6d311ef0c21d60c45b63c182c5834fd2, type: 3}
+  vfxDoorOpen: {fileID: 5846736017013714778, guid: 42989f7d96789ec41945f5a9060d6cb7, type: 3}
+  vfxCloneSpawn: {fileID: 312057046168990505, guid: 9717207e8c808994b91d88b9eadb1be4, type: 3}
+  vfxBoxPush: {fileID: 7077553221926653704, guid: 2573b044d88e6d241aa20a06998e45e3, type: 3}
+  vfxLevelComplete: {fileID: 4014256486533261262, guid: 0114b4fa51dda3f459f429f415fd104f, type: 3}
+  pooledRoot: {fileID: 0}
+--- !u!4 &1097782299
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1097782297}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1133393969
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5428,3 +5478,4 @@ SceneRoots:
   - {fileID: 1777572010}
   - {fileID: 1057955668}
   - {fileID: 291708739}
+  - {fileID: 1097782299}

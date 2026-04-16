@@ -65,6 +65,11 @@ public class LevelExit : MonoBehaviour
     {
         Debug.Log("[LevelExit] Level complete!");
 
+        if (VFXManager.Instance != null)
+        {
+            VFXManager.Instance.PlayLevelComplete(transform.position);
+        }
+
         if (completionVFX != null)
         {
             completionVFX.SetActive(true);

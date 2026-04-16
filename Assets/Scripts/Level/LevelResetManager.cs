@@ -329,6 +329,11 @@ public class LevelResetManager : MonoBehaviour
             moveSpeed: 8f);
 
         activeClones.Add(controller);
+
+        if (VFXManager.Instance != null)
+        {
+            VFXManager.Instance.PlayCloneSpawn(playerStart);
+        }
     }
 
     private void TryAutoBindEndTurnButton()
