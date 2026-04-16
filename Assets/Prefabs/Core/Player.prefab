@@ -655,6 +655,8 @@ GameObject:
   - component: {fileID: 36085719184243231}
   - component: {fileID: 5050298452290379616}
   - component: {fileID: 2718498772713468671}
+  - component: {fileID: 354831064048558376}
+  - component: {fileID: 4817185863617190795}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -671,7 +673,7 @@ Transform:
   m_GameObject: {fileID: 8478258636623888557}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18, y: 0.5, z: 20}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -898,3 +900,34 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &354831064048558376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8478258636623888557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d225969206ff8544b8c3da8a5667c4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  headTransform: {fileID: 9043989294318686226}
+  bobHeight: 0.04
+  bobSpeed: 1.8
+  returnSpeed: 8
+  idleDelay: 0.15
+--- !u!114 &4817185863617190795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8478258636623888557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cc4a8928723b744c8379bf9b4b4d592, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementController: {fileID: 0}
+  idleHeadBob: {fileID: 354831064048558376}
