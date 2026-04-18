@@ -15,5 +15,5 @@ MonoBehaviour:
   levelName: Level_6
   levelIndex: 6
   maxTurns: 2
-  nextSceneName: Level_1
+  nextSceneName: MainMenu
   nextSceneIndex: 0

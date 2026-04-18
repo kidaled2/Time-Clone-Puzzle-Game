@@ -16,4 +16,4 @@ MonoBehaviour:
   levelIndex: 2
   maxTurns: 2
   nextSceneName: Level_3
-  nextSceneIndex: 2
+  nextSceneIndex: 3

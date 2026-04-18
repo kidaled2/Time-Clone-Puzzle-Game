@@ -2347,6 +2347,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 741804566115567996, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
+      propertyPath: nextSceneName
+      value: Level_6
+      objectReference: {fileID: 0}
+    - target: {fileID: 741804566115567996, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
+      propertyPath: nextSceneIndex
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 2256776146957795892, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -2354,14 +2362,6 @@ PrefabInstance:
     - target: {fileID: 4539227401191506203, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
       propertyPath: m_Name
       value: LevelExit
-      objectReference: {fileID: 0}
-    - target: {fileID: 741804566115567996, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
-      propertyPath: nextSceneName
-      value: Level_6
-      objectReference: {fileID: 0}
-    - target: {fileID: 741804566115567996, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
-      propertyPath: nextSceneIndex
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6932171208732333281, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
       propertyPath: m_LocalPosition.x

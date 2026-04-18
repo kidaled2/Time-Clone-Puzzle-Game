@@ -92,6 +92,11 @@ public class LevelExit : MonoBehaviour
 
     private void LoadNextLevel()
     {
+        if (TimeClone.Level.LevelExitToMenu.TryHandleLevelSelectReturn())
+        {
+            return;
+        }
+
         if (nextSceneIndex >= 0 && nextSceneIndex < SceneManager.sceneCountInBuildSettings)
         {
             SceneManager.LoadScene(nextSceneIndex);
