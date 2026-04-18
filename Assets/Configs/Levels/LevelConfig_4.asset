@@ -15,5 +15,5 @@ MonoBehaviour:
   levelName: Level_4
   levelIndex: 4
   maxTurns: 2
-  nextSceneName: 
-  nextSceneIndex: -1
+  nextSceneName: Level_5
+  nextSceneIndex: 4
