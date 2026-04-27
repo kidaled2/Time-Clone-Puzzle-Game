@@ -16,12 +16,25 @@ public class LevelExit : MonoBehaviour
     [SerializeField] private Light exitLight;
     [SerializeField] private GameObject completionVFX;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip achievementClip;
+    [SerializeField, Range(0f, 1f)] private float achievementVolume = 1f;
+
     private bool isActive = true;
     private bool isTriggered;
 
     private float baseLightIntensity = 2.5f;
     private float pulseSpeed = 2f;
     private float pulseAmount = 0.8f;
+
+    private void Awake()
+    {
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+    }
 
     private void Update()
     {
@@ -64,6 +77,8 @@ public class LevelExit : MonoBehaviour
     private IEnumerator CompleteLevel()
     {
         Debug.Log("[LevelExit] Level complete!");
+
+        PlayAchievementSound();
 
         if (VFXManager.Instance != null)
         {
@@ -112,5 +127,15 @@ public class LevelExit : MonoBehaviour
         Debug.LogWarning("[LevelExit] No next scene assigned. Reloading current scene.");
         Scene activeScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(activeScene.buildIndex);
+    }
+
+    private void PlayAchievementSound()
+    {
+        if (audioSource == null || achievementClip == null || achievementVolume <= 0f)
+        {
+            return;
+        }
+
+        audioSource.PlayOneShot(achievementClip, achievementVolume);
     }
 }
