@@ -4,30 +4,63 @@ using UnityEngine;
 
 public class PressurePlate : MonoBehaviour
 {
-    [SerializeField] private string plateId = "Plate_1";
-    [SerializeField] private MeshRenderer plateRenderer;
-    [SerializeField] private SlidingDoor pairedDoor;
+    private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+    private static readonly int ColorId = Shader.PropertyToID("_Color");
+    private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
-    private static readonly Color ColorNeutral = new Color(0.54f, 0.54f, 0.60f);
-    private static readonly Color ColorActive = new Color(1.00f, 0.84f, 0.00f);
+    [SerializeField] private string plateId = "Plate_1";
+
+    [Header("Visual Variant")]
+    [SerializeField] private MechanicColorVariant colorVariant = MechanicColorVariant.Cyan;
+    [SerializeField] private bool deriveVariantFromId = true;
+
+    [Header("Visual Renderers")]
+    [SerializeField] private MeshRenderer plateRenderer;
+    [SerializeField] private MeshRenderer baseRenderer;
+    [SerializeField] private MeshRenderer[] accentRenderers;
+
+    [Header("Door Pairing")]
+    [SerializeField] private SlidingDoor pairedDoor;
 
     public bool IsActivated { get; private set; }
     public string PlateId => plateId;
 
     private readonly HashSet<string> actorsOnPlate = new HashSet<string>();
     private Coroutine colorCoroutine;
+    private Color currentSurfaceColor;
+    private MaterialPropertyBlock propertyBlock;
 
     private void Awake()
     {
-        if (plateRenderer == null)
+        if (deriveVariantFromId)
         {
-            plateRenderer = GetComponent<MeshRenderer>();
+            colorVariant = MechanicColorPalette.InferFromId(plateId);
         }
 
-        if (plateRenderer != null)
+        if (plateRenderer == null)
         {
-            plateRenderer.material.color = ColorNeutral;
+            Transform surface = transform.Find("Plate_Surface");
+            plateRenderer = surface != null ? surface.GetComponent<MeshRenderer>() : GetComponent<MeshRenderer>();
         }
+
+        if (baseRenderer == null)
+        {
+            baseRenderer = GetComponent<MeshRenderer>();
+        }
+
+        if (accentRenderers == null || accentRenderers.Length == 0)
+        {
+            accentRenderers = GetNamedRenderers("Accent");
+        }
+
+        if (pairedDoor != null)
+        {
+            pairedDoor.SetVariant(colorVariant);
+        }
+
+        propertyBlock = new MaterialPropertyBlock();
+        ApplyStaticVisuals();
+        SetSurfaceColor(MechanicColorPalette.GetPlateInactiveColor(colorVariant));
     }
 
     private void OnTriggerEnter(Collider other)
@@ -91,7 +124,11 @@ public class PressurePlate : MonoBehaviour
             StopCoroutine(colorCoroutine);
         }
 
-        colorCoroutine = StartCoroutine(LerpColor(IsActivated ? ColorActive : ColorNeutral));
+        Color target = IsActivated
+            ? MechanicColorPalette.GetPlateActiveColor(colorVariant)
+            : MechanicColorPalette.GetPlateInactiveColor(colorVariant);
+
+        colorCoroutine = StartCoroutine(LerpColor(target));
     }
 
     private IEnumerator LerpColor(Color target)
@@ -101,18 +138,74 @@ public class PressurePlate : MonoBehaviour
             yield break;
         }
 
-        Color start = plateRenderer.material.color;
+        Color start = currentSurfaceColor;
         float elapsed = 0f;
         const float duration = 0.2f;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            plateRenderer.material.color = Color.Lerp(start, target, elapsed / duration);
+            SetSurfaceColor(Color.Lerp(start, target, elapsed / duration));
             yield return null;
         }
 
-        plateRenderer.material.color = target;
+        SetSurfaceColor(target);
         colorCoroutine = null;
+    }
+
+    private MeshRenderer[] GetNamedRenderers(string namePart)
+    {
+        MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>(true);
+        var matches = new System.Collections.Generic.List<MeshRenderer>();
+
+        foreach (MeshRenderer renderer in renderers)
+        {
+            if (renderer.gameObject.name.Contains(namePart))
+            {
+                matches.Add(renderer);
+            }
+        }
+
+        return matches.ToArray();
+    }
+
+    private void ApplyStaticVisuals()
+    {
+        SetRendererColor(baseRenderer, MechanicColorPalette.GetFrameColor(), false);
+
+        Color accent = MechanicColorPalette.GetAccent(colorVariant);
+        if (accentRenderers == null)
+        {
+            return;
+        }
+
+        foreach (MeshRenderer renderer in accentRenderers)
+        {
+            SetRendererColor(renderer, accent, true);
+        }
+    }
+
+    private void SetSurfaceColor(Color color)
+    {
+        currentSurfaceColor = color;
+        SetRendererColor(plateRenderer, color, true);
+    }
+
+    private void SetRendererColor(MeshRenderer renderer, Color color, bool emissive)
+    {
+        if (renderer == null)
+        {
+            return;
+        }
+
+        propertyBlock ??= new MaterialPropertyBlock();
+        Color emissionColor = emissive ? color * 0.5f : Color.black;
+        emissionColor.a = 1f;
+
+        renderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.SetColor(BaseColorId, color);
+        propertyBlock.SetColor(ColorId, color);
+        propertyBlock.SetColor(EmissionColorId, emissionColor);
+        renderer.SetPropertyBlock(propertyBlock);
     }
 
     /// <summary>
@@ -129,9 +222,7 @@ public class PressurePlate : MonoBehaviour
             colorCoroutine = null;
         }
 
-        if (plateRenderer != null)
-        {
-            plateRenderer.material.color = ColorNeutral;
-        }
+        ApplyStaticVisuals();
+        SetSurfaceColor(MechanicColorPalette.GetPlateInactiveColor(colorVariant));
     }
 }
