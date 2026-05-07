@@ -8,6 +8,8 @@ namespace TimeClone.Audio
     {
         private const int MainMenuBuildIndex = 0;
         private const string MainMenuSceneName = "MainMenu";
+        private const string MusicVolumeKey = "MusicVolume";
+        private const float DefaultMusicVolume = 0.7f;
 
         public static MusicManager Instance { get; private set; }
 
@@ -21,6 +23,9 @@ namespace TimeClone.Audio
         [SerializeField] private AudioSource audioSource;
 
         private MusicTrack currentTrack = MusicTrack.None;
+        private float musicVolume = DefaultMusicVolume;
+
+        public float MusicVolume => musicVolume;
 
         private enum MusicTrack
         {
@@ -39,6 +44,7 @@ namespace TimeClone.Audio
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            musicVolume = GetSavedMusicVolume();
 
             if (audioSource == null)
             {
@@ -61,6 +67,19 @@ namespace TimeClone.Audio
                 SceneManager.sceneLoaded -= OnSceneLoaded;
                 Instance = null;
             }
+        }
+
+        public void SetMusicVolume(float volume)
+        {
+            musicVolume = Mathf.Clamp01(volume);
+            PlayerPrefs.SetFloat(MusicVolumeKey, musicVolume);
+            PlayerPrefs.Save();
+            ApplyCurrentVolume();
+        }
+
+        public static float GetSavedMusicVolume()
+        {
+            return Mathf.Clamp01(PlayerPrefs.GetFloat(MusicVolumeKey, DefaultMusicVolume));
         }
 
         public static void PlayMainMenuMusic(bool restart = true)
@@ -118,7 +137,16 @@ namespace TimeClone.Audio
 
         private float GetVolume(MusicTrack track)
         {
-            return track == MusicTrack.MainMenu ? mainMenuVolume : gameplayVolume;
+            float trackVolume = track == MusicTrack.MainMenu ? mainMenuVolume : gameplayVolume;
+            return Mathf.Clamp01(trackVolume * musicVolume);
+        }
+
+        private void ApplyCurrentVolume()
+        {
+            if (audioSource != null && currentTrack != MusicTrack.None)
+            {
+                audioSource.volume = GetVolume(currentTrack);
+            }
         }
 
         private void ConfigureAudioSource()
