@@ -67,7 +67,7 @@ public class PushableBox : MonoBehaviour
 
         if (VFXManager.Instance != null)
         {
-            VFXManager.Instance.PlayBoxPush(transform.position);
+            VFXManager.Instance.PlayBoxPush(transform.position, worldDirection);
         }
 
         moveRoutine = StartCoroutine(MoveRoutine(targetPosition));

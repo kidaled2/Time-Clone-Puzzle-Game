@@ -65,7 +65,15 @@ public class VFXManager : MonoBehaviour
 
     public void PlayBoxPush(Vector3 position)
     {
-        PlayEffect(vfxBoxPush, position);
+        PlayBoxPush(position, Vector3.forward);
+    }
+
+    public void PlayBoxPush(Vector3 position, Vector3 pushDirection)
+    {
+        Quaternion rotation = pushDirection.sqrMagnitude > 0.001f
+            ? Quaternion.LookRotation(pushDirection.normalized, Vector3.up)
+            : Quaternion.identity;
+        PlayEffect(vfxBoxPush, position, rotation);
     }
 
     public void PlayLevelComplete(Vector3 position)
@@ -74,6 +82,11 @@ public class VFXManager : MonoBehaviour
     }
 
     private void PlayEffect(GameObject prefab, Vector3 position)
+    {
+        PlayEffect(prefab, position, Quaternion.identity);
+    }
+
+    private void PlayEffect(GameObject prefab, Vector3 position, Quaternion rotation)
     {
         if (prefab == null)
         {
@@ -87,7 +100,7 @@ public class VFXManager : MonoBehaviour
         }
 
         GameObject effectObject = particleSystem.gameObject;
-        effectObject.transform.SetPositionAndRotation(position, Quaternion.identity);
+        effectObject.transform.SetPositionAndRotation(position, rotation);
         effectObject.transform.SetParent(pooledRoot, true);
         effectObject.SetActive(true);
 

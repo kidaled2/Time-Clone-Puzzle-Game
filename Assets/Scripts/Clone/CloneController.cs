@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using TimeClone.Recording;
 using UnityEngine;
 
+#if DOTWEEN
+using DG.Tweening;
+#endif
+
 public class CloneController : MonoBehaviour, IActorTag
 {
     [SerializeField] private MeshRenderer visualRenderer;
@@ -16,10 +20,27 @@ public class CloneController : MonoBehaviour, IActorTag
     [SerializeField] private float upperFloorY = 1.6f;
     [SerializeField] private float upperFloorThresholdY = 1.5f;
 
+    [Header("Visual Polish")]
+    [SerializeField] private float spawnOvershootScale = 1.15f;
+    [SerializeField] private float spawnGrowDuration = 0.15f;
+    [SerializeField] private float spawnSettleDuration = 0.1f;
+    [SerializeField] private Color stepFlashColor = Color.cyan;
+    [SerializeField] private float stepFlashDuration = 0.1f;
+
     private string actorId = "Clone_1";
     private List<MovementFrame> frames;
     private bool isReplaying;
     private float moveSpeed = 8f;
+    private Material bodyRuntimeMaterial;
+    private Material[] additionalRuntimeMaterials;
+    private Vector3 spawnRestScale = Vector3.one;
+    private Coroutine spawnRoutine;
+    private Coroutine flashRoutine;
+
+#if DOTWEEN
+    private Tween spawnTween;
+    private Tween flashTween;
+#endif
 
     public string ActorId => actorId;
 
@@ -27,6 +48,17 @@ public class CloneController : MonoBehaviour, IActorTag
     {
         TryAssignWallLayerIfUnset();
         TryAssignGroundLayerIfUnset();
+        spawnRestScale = transform.localScale;
+    }
+
+    private void Start()
+    {
+        PlaySpawnAnimation();
+    }
+
+    private void OnDisable()
+    {
+        StopVisualTweens();
     }
 
     /// <summary>
@@ -43,15 +75,18 @@ public class CloneController : MonoBehaviour, IActorTag
             if (visualRenderer != null)
             {
                 visualRenderer.material = bodyMat;
+                bodyRuntimeMaterial = visualRenderer.material;
             }
 
             if (additionalBodyRenderers != null)
             {
+                additionalRuntimeMaterials = new Material[additionalBodyRenderers.Length];
                 for (int i = 0; i < additionalBodyRenderers.Length; i++)
                 {
                     if (additionalBodyRenderers[i] != null)
                     {
                         additionalBodyRenderers[i].material = bodyMat;
+                        additionalRuntimeMaterials[i] = additionalBodyRenderers[i].material;
                     }
                 }
             }
@@ -60,6 +95,9 @@ public class CloneController : MonoBehaviour, IActorTag
         if (rimRenderer != null && rimMat != null)
         {
             rimRenderer.material = rimMat;
+            stepFlashColor = rimRenderer.material.HasProperty("_EmissionColor")
+                ? rimRenderer.material.GetColor("_EmissionColor")
+                : rimRenderer.material.color;
         }
     }
 
@@ -125,6 +163,7 @@ public class CloneController : MonoBehaviour, IActorTag
                 continue;
             }
 
+            PlayStepFlash();
             yield return StartCoroutine(MoveToTarget(target));
         }
 
@@ -309,6 +348,159 @@ public class CloneController : MonoBehaviour, IActorTag
             groundLayerMask = 1 << groundLayer;
         }
     }
+
+    private void PlaySpawnAnimation()
+    {
+        StopSpawnAnimation();
+
+#if DOTWEEN
+        transform.localScale = Vector3.zero;
+        spawnTween = DOTween.Sequence()
+            .Append(transform.DOScale(spawnRestScale * spawnOvershootScale, spawnGrowDuration).SetEase(Ease.OutBack))
+            .Append(transform.DOScale(spawnRestScale, spawnSettleDuration).SetEase(Ease.OutSine))
+            .OnComplete(() => spawnTween = null);
+#else
+        spawnRoutine = StartCoroutine(SpawnRoutine());
+#endif
+    }
+
+    private void PlayStepFlash()
+    {
+        if (bodyRuntimeMaterial == null)
+        {
+            return;
+        }
+
+#if DOTWEEN
+        if (flashTween != null && flashTween.IsActive())
+        {
+            flashTween.Kill();
+        }
+
+        SetEmission(stepFlashColor);
+        flashTween = DOTween.To(
+                () => stepFlashColor,
+                SetEmission,
+                Color.black,
+                stepFlashDuration)
+            .SetEase(Ease.OutSine)
+            .OnComplete(() => flashTween = null);
+#else
+        if (flashRoutine != null)
+        {
+            StopCoroutine(flashRoutine);
+        }
+
+        flashRoutine = StartCoroutine(FlashRoutine());
+#endif
+    }
+
+    private void SetEmission(Color color)
+    {
+        SetMaterialEmission(bodyRuntimeMaterial, color);
+
+        if (additionalRuntimeMaterials == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < additionalRuntimeMaterials.Length; i++)
+        {
+            SetMaterialEmission(additionalRuntimeMaterials[i], color);
+        }
+    }
+
+    private static void SetMaterialEmission(Material material, Color color)
+    {
+        if (material == null)
+        {
+            return;
+        }
+
+        material.EnableKeyword("_EMISSION");
+        material.SetColor("_EmissionColor", color);
+    }
+
+    private void StopVisualTweens()
+    {
+        StopSpawnAnimation();
+
+#if DOTWEEN
+        if (flashTween != null && flashTween.IsActive())
+        {
+            flashTween.Kill();
+            flashTween = null;
+        }
+#else
+        if (flashRoutine != null)
+        {
+            StopCoroutine(flashRoutine);
+            flashRoutine = null;
+        }
+#endif
+
+        SetEmission(Color.black);
+    }
+
+    private void StopSpawnAnimation()
+    {
+#if DOTWEEN
+        if (spawnTween != null && spawnTween.IsActive())
+        {
+            spawnTween.Kill();
+            spawnTween = null;
+        }
+#else
+        if (spawnRoutine != null)
+        {
+            StopCoroutine(spawnRoutine);
+            spawnRoutine = null;
+        }
+#endif
+    }
+
+#if !DOTWEEN
+    private IEnumerator SpawnRoutine()
+    {
+        transform.localScale = Vector3.zero;
+        yield return ScaleRoutine(Vector3.zero, spawnRestScale * spawnOvershootScale, spawnGrowDuration);
+        yield return ScaleRoutine(transform.localScale, spawnRestScale, spawnSettleDuration);
+        spawnRoutine = null;
+    }
+
+    private IEnumerator ScaleRoutine(Vector3 start, Vector3 target, float duration)
+    {
+        float elapsed = 0f;
+        float safeDuration = Mathf.Max(0.001f, duration);
+
+        while (elapsed < safeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / safeDuration);
+            float eased = 1f - Mathf.Pow(1f - t, 3f);
+            transform.localScale = Vector3.LerpUnclamped(start, target, eased);
+            yield return null;
+        }
+
+        transform.localScale = target;
+    }
+
+    private IEnumerator FlashRoutine()
+    {
+        float elapsed = 0f;
+
+        while (elapsed < stepFlashDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / Mathf.Max(0.001f, stepFlashDuration));
+            SetEmission(Color.Lerp(stepFlashColor, Color.black, t));
+            yield return null;
+        }
+
+        SetEmission(Color.black);
+        flashRoutine = null;
+    }
+#endif
 }
 
 

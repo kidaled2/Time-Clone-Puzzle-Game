@@ -52,9 +52,13 @@ MonoBehaviour:
   clonePrefab: {fileID: 5362923821190912875, guid: 104117484c737634db378458f7ceadc7, type: 3}
   allPlates: []
   allDoors: []
+  allBoxes: []
   cloneMaterial1Body: {fileID: 2100000, guid: db24d474ed256c9419305a4e2e2d458f, type: 2}
-  cloneMaterial1Rim: {fileID: 2100000, guid: 78d8ce1856e7ac94db3ad68946fbef9d, type: 2}
+  cloneMaterial1Rim: {fileID: 2100000, guid: c624ea212f8459c469ed95579b66b7e2, type: 2}
   cloneMaterial2Body: {fileID: 2100000, guid: b83561ce5b51a88478253e4cdc0ca607, type: 2}
-  cloneMaterial2Rim: {fileID: 2100000, guid: 560a7a1be96e5924ca5e76525375a805, type: 2}
+  cloneMaterial2Rim: {fileID: 2100000, guid: 5a6ac2bd7e99a6b48bdc466ba9f29c66, type: 2}
   levelExit: {fileID: 0}
   endTurnButton: {fileID: 0}
+  cloneCounterUI: {fileID: 0}
+  turnTimer: {fileID: 0}
+  turnTimerUI: {fileID: 0}

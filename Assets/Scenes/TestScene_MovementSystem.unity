@@ -276,6 +276,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1 &11085732
 GameObject:
   m_ObjectHideFlags: 0
@@ -2075,8 +2079,12 @@ MonoBehaviour:
   overshootScale: 1.03
   pressDuration: 0.06
   releaseDuration: 0.12
-  clickClip: {fileID: 0}
+  clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!114 &275589414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3530,6 +3538,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1 &629584324
 GameObject:
   m_ObjectHideFlags: 0
@@ -4488,6 +4500,8 @@ MonoBehaviour:
   colorCritical: {r: 1, g: 0.3, b: 0.3, a: 1}
   warningThreshold: 20
   criticalThreshold: 10
+  criticalColorLerpDuration: 1
+  criticalPunchScale: 0.15
 --- !u!114 &859081465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5905,6 +5919,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1 &1075781044
 GameObject:
   m_ObjectHideFlags: 0
@@ -6275,6 +6293,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1 &1145524818
 GameObject:
   m_ObjectHideFlags: 0
@@ -11027,6 +11049,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1001 &1708594706209051387
 PrefabInstance:
   m_ObjectHideFlags: 0

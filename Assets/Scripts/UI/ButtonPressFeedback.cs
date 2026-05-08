@@ -3,6 +3,10 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+#if DOTWEEN
+using DG.Tweening;
+#endif
+
 namespace TimeClone.UI
 {
     [RequireComponent(typeof(Button))]
@@ -19,22 +23,40 @@ namespace TimeClone.UI
         [SerializeField] private AudioClip clickClip;
         [SerializeField, Range(0f, 1f)] private float clickVolume = 0.65f;
 
+        [Header("Idle Pulse")]
+        [SerializeField] private bool idlePulse = false;
+        [SerializeField, Range(0f, 1f)] private float idlePulseMinAlpha = 0.75f;
+        [SerializeField, Range(0f, 1f)] private float idlePulseMaxAlpha = 0.95f;
+        [SerializeField, Min(0.1f)] private float idlePulseDuration = 1.8f;
+
         private static AudioSource sharedAudioSource;
 
         private Button button;
+        private Image buttonImage;
+        private Color baseImageColor = Color.white;
         private Vector3 restScale = Vector3.one;
         private Coroutine scaleRoutine;
+        private Coroutine pulseRoutine;
         private bool isPointerDown;
+
+#if DOTWEEN
+        private Tween pulseTween;
+#endif
 
         private void Awake()
         {
             button = GetComponent<Button>();
+            buttonImage = GetComponent<Image>();
             if (targetTransform == null)
             {
                 targetTransform = transform;
             }
 
             restScale = targetTransform.localScale;
+            if (buttonImage != null)
+            {
+                baseImageColor = buttonImage.color;
+            }
         }
 
         private void OnEnable()
@@ -43,16 +65,24 @@ namespace TimeClone.UI
             {
                 restScale = targetTransform.localScale;
             }
+
+            StartIdlePulse();
         }
 
         private void OnDisable()
         {
             isPointerDown = false;
             StopScaleRoutine();
+            StopIdlePulse();
 
             if (targetTransform != null)
             {
                 targetTransform.localScale = restScale;
+            }
+
+            if (buttonImage != null)
+            {
+                buttonImage.color = baseImageColor;
             }
         }
 
@@ -193,5 +223,65 @@ namespace TimeClone.UI
             sharedAudioSource.spatialBlend = 0f;
             return sharedAudioSource;
         }
+
+        private void StartIdlePulse()
+        {
+            if (!idlePulse || buttonImage == null)
+            {
+                return;
+            }
+
+            StopIdlePulse();
+            baseImageColor = buttonImage.color;
+
+#if DOTWEEN
+            Color pulseTarget = baseImageColor;
+            pulseTarget.a = idlePulseMaxAlpha;
+            Color pulseStart = baseImageColor;
+            pulseStart.a = idlePulseMinAlpha;
+            buttonImage.color = pulseStart;
+            pulseTween = buttonImage
+                .DOColor(pulseTarget, idlePulseDuration * 0.5f)
+                .SetEase(Ease.InOutSine)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetUpdate(true);
+#else
+            pulseRoutine = StartCoroutine(IdlePulseRoutine());
+#endif
+        }
+
+        private void StopIdlePulse()
+        {
+#if DOTWEEN
+            if (pulseTween != null && pulseTween.IsActive())
+            {
+                pulseTween.Kill();
+                pulseTween = null;
+            }
+#else
+            if (pulseRoutine != null)
+            {
+                StopCoroutine(pulseRoutine);
+                pulseRoutine = null;
+            }
+#endif
+        }
+
+#if !DOTWEEN
+        private IEnumerator IdlePulseRoutine()
+        {
+            float elapsed = 0f;
+
+            while (true)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float wave = (Mathf.Sin((elapsed / Mathf.Max(0.001f, idlePulseDuration)) * Mathf.PI * 2f) + 1f) * 0.5f;
+                Color color = baseImageColor;
+                color.a = Mathf.Lerp(idlePulseMinAlpha, idlePulseMaxAlpha, wave);
+                buttonImage.color = color;
+                yield return null;
+            }
+        }
+#endif
     }
 }

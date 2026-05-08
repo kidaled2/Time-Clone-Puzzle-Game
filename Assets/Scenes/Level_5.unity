@@ -276,6 +276,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1001 &37668640
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -948,6 +952,8 @@ MonoBehaviour:
   colorCritical: {r: 1, g: 0.3, b: 0.3, a: 1}
   warningThreshold: 20
   criticalThreshold: 10
+  criticalColorLerpDuration: 1
+  criticalPunchScale: 0.15
 --- !u!114 &173549638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2263,6 +2269,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1 &421749244
 GameObject:
   m_ObjectHideFlags: 0
@@ -3389,7 +3399,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -4798,6 +4808,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1001 &977429874
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4860,6 +4874,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1972480205386790202, guid: 2722267b6abc144469c2f0a7c4ee129c, type: 3}
   m_PrefabInstance: {fileID: 977429874}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &977538298
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 977538300}
+  - component: {fileID: 977538299}
+  m_Layer: 0
+  m_Name: GlobalPostProcessVolume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &977538299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 977538298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 0219c74d4b3b7d246bd62faafb677b96, type: 2}
+--- !u!4 &977538300
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 977538298}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &986899628
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6210,6 +6273,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1001 &1202969202
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8984,6 +9051,10 @@ MonoBehaviour:
   releaseDuration: 0.12
   clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!1001 &1794306003
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10137,8 +10208,12 @@ MonoBehaviour:
   overshootScale: 1.03
   pressDuration: 0.06
   releaseDuration: 0.12
-  clickClip: {fileID: 0}
+  clickClip: {fileID: 8300000, guid: 9737cb3607b34e24b8bb478c6d3f14b8, type: 3}
   clickVolume: 0.65
+  idlePulse: 1
+  idlePulseMinAlpha: 0.75
+  idlePulseMaxAlpha: 0.95
+  idlePulseDuration: 1.8
 --- !u!114 &2106226294
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10340,3 +10415,4 @@ SceneRoots:
   - {fileID: 520942532}
   - {fileID: 766507568}
   - {fileID: 1109374001}
+  - {fileID: 977538300}
