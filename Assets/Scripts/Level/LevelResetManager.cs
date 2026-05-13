@@ -47,6 +47,9 @@ public class LevelResetManager : MonoBehaviour
     private Vector3 playerStart;
     private bool isResetting;
     private bool hasWarnedMissingCloneCounterUI;
+    private bool waitingForFirstMove;
+    private bool hasPendingFirstMoveFrame;
+    private MovementFrame pendingFirstMoveFrame;
 
     private void Awake()
     {
@@ -61,6 +64,11 @@ public class LevelResetManager : MonoBehaviour
         {
             turnTimer.OnTimerExpired += OnTurnTimerExpired;
         }
+
+        if (player != null)
+        {
+            player.OnMoveConfirmed += OnPlayerFirstMove;
+        }
     }
 
     private void OnDestroy()
@@ -68,6 +76,11 @@ public class LevelResetManager : MonoBehaviour
         if (turnTimer != null)
         {
             turnTimer.OnTimerExpired -= OnTurnTimerExpired;
+        }
+
+        if (player != null)
+        {
+            player.OnMoveConfirmed -= OnPlayerFirstMove;
         }
     }
 
@@ -107,17 +120,13 @@ public class LevelResetManager : MonoBehaviour
 
         recorder.StopRecording();
         List<MovementFrame> frames = new List<MovementFrame>(recorder.GetRecordedFrames());
+        EnsureFirstMoveFrameRecorded(frames);
         allRecordings.Add(frames);
 
         if (currentTurn >= levelConfig.maxTurns)
         {
             Debug.Log("[LevelResetManager] Max turns reached.");
             return;
-        }
-
-        if (turnTimer != null)
-        {
-            turnTimer.StopTimer();
         }
 
         StartCoroutine(ResetAndStartNextTurn());
@@ -127,16 +136,6 @@ public class LevelResetManager : MonoBehaviour
     {
         isResetting = true;
         SyncBoxReferences();
-
-        if (turnTimer != null)
-        {
-            turnTimer.StopTimer();
-        }
-
-        if (turnTimerUI != null)
-        {
-            turnTimerUI.Hide();
-        }
 
         if (levelExit != null)
         {
@@ -256,25 +255,19 @@ public class LevelResetManager : MonoBehaviour
         if (recorder != null)
         {
             recorder.ClearRecording();
-            recorder.StartRecording();
         }
+
+        waitingForFirstMove = true;
+        hasPendingFirstMoveFrame = false;
 
         if (inputHandler != null)
         {
             inputHandler.SetInputEnabled(true);
         }
 
-        for (int i = 0; i < activeClones.Count; i++)
+        if (turnTimer != null && currentTurn == 1)
         {
-            if (activeClones[i] != null)
-            {
-                activeClones[i].StartReplay();
-            }
-        }
-
-        if (turnTimer != null)
-        {
-            turnTimer.StartTimer();
+            turnTimer.ResetTimer();
         }
 
         if (turnTimerUI != null)
@@ -288,6 +281,58 @@ public class LevelResetManager : MonoBehaviour
 
         UpdateCloneUI();
         Debug.Log($"[LevelResetManager] Turn {currentTurn} started.");
+    }
+
+    private void OnPlayerFirstMove(Vector2 inputDirection, Vector3 targetPosition)
+    {
+        if (!waitingForFirstMove)
+        {
+            return;
+        }
+
+        waitingForFirstMove = false;
+        pendingFirstMoveFrame = new MovementFrame(0f, inputDirection, targetPosition);
+        hasPendingFirstMoveFrame = true;
+
+        if (recorder != null)
+        {
+            recorder.StartRecording();
+        }
+
+        if (turnTimer != null && !turnTimer.IsRunning)
+        {
+            turnTimer.ResumeTimer();
+        }
+
+        for (int i = 0; i < activeClones.Count; i++)
+        {
+            if (activeClones[i] != null)
+            {
+                activeClones[i].StartReplay();
+            }
+        }
+    }
+
+    private void EnsureFirstMoveFrameRecorded(List<MovementFrame> frames)
+    {
+        if (!hasPendingFirstMoveFrame)
+        {
+            return;
+        }
+
+        if (frames.Count == 0 || !IsSameMoveFrame(frames[0], pendingFirstMoveFrame))
+        {
+            frames.Insert(0, pendingFirstMoveFrame);
+        }
+
+        hasPendingFirstMoveFrame = false;
+    }
+
+    private static bool IsSameMoveFrame(MovementFrame a, MovementFrame b)
+    {
+        const float positionTolerance = 0.001f;
+        return a.inputDirection == b.inputDirection &&
+               Vector3.SqrMagnitude(a.worldPosition - b.worldPosition) <= positionTolerance * positionTolerance;
     }
 
     private void SpawnClone(int index, List<MovementFrame> frames)

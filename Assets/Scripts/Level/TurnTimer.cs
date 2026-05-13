@@ -19,6 +19,11 @@ public class TurnTimer : MonoBehaviour
         isRunning = true;
     }
 
+    public void ResumeTimer()
+    {
+        isRunning = true;
+    }
+
     public void StopTimer()
     {
         isRunning = false;

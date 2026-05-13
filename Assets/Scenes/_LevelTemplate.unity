@@ -787,6 +787,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 291708738}
     - target: {fileID: 7041025758383531446, guid: 5e49bdf44da10764eb6684867779da07, type: 3}
+      propertyPath: levelConfig
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7041025758383531446, guid: 5e49bdf44da10764eb6684867779da07, type: 3}
       propertyPath: turnTimerUI
       value: 
       objectReference: {fileID: 173549637}
