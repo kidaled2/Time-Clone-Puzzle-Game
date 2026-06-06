@@ -1,4 +1,5 @@
 using System.Collections;
+using TimeClone.Level;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -78,6 +79,7 @@ public class LevelExit : MonoBehaviour
     {
         Debug.Log("[LevelExit] Level complete!");
 
+        RecordBestTime();
         PlayAchievementSound();
 
         if (VFXManager.Instance != null)
@@ -137,5 +139,28 @@ public class LevelExit : MonoBehaviour
         }
 
         audioSource.PlayOneShot(achievementClip, achievementVolume);
+    }
+
+    private void RecordBestTime()
+    {
+        Scene activeScene = SceneManager.GetActiveScene();
+        if (activeScene.buildIndex < 0)
+        {
+            return;
+        }
+
+        TurnTimer[] timers = FindObjectsByType<TurnTimer>(FindObjectsSortMode.None);
+        if (timers == null || timers.Length == 0 || timers[0] == null)
+        {
+            return;
+        }
+
+        TurnTimer timer = timers[0];
+        float elapsedSeconds = Mathf.Clamp(
+            timer.TurnDuration - timer.TimeRemaining,
+            0f,
+            timer.TurnDuration);
+
+        LevelBestTimeSession.TrySubmitBestTime(activeScene.buildIndex, elapsedSeconds);
     }
 }

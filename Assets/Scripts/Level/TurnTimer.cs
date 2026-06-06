@@ -11,6 +11,7 @@ public class TurnTimer : MonoBehaviour
     private bool isRunning;
 
     public float TimeRemaining => timeRemaining;
+    public float TurnDuration => turnDuration;
     public bool IsRunning => isRunning;
 
     public void StartTimer()

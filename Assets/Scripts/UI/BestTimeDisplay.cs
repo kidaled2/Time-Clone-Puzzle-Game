@@ -1,45 +1,40 @@
 using TMPro;
 using TimeClone.Level;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 namespace TimeClone.UI
 {
-    public class LevelSelectButton : MonoBehaviour
+    public sealed class BestTimeDisplay : MonoBehaviour
     {
-        [SerializeField] private int levelSceneIndex;
-        [SerializeField] private MainMenuManager menuManager;
         [SerializeField] private TextMeshProUGUI bestTimeLabel;
+        [SerializeField] private int levelSceneIndex = -1;
 
-        private void Start()
+        private void Awake()
         {
-            if (menuManager == null)
+            if (bestTimeLabel == null)
             {
-                menuManager = GetComponentInParent<MainMenuManager>();
+                bestTimeLabel = GetComponent<TextMeshProUGUI>();
             }
-
-            Button button = GetComponent<Button>();
-            if (button != null && menuManager != null)
-            {
-                button.onClick.AddListener(() => menuManager.OnLevelButtonPressed(levelSceneIndex));
-            }
-
-            RefreshBestTimeLabel();
         }
 
         private void OnEnable()
         {
-            RefreshBestTimeLabel();
+            Refresh();
         }
 
-        public void RefreshBestTimeLabel()
+        public void Refresh()
         {
             if (bestTimeLabel == null)
             {
                 return;
             }
 
-            if (LevelBestTimeSession.TryGetBestTime(levelSceneIndex, out float bestSeconds))
+            int targetSceneIndex = levelSceneIndex >= 0
+                ? levelSceneIndex
+                : SceneManager.GetActiveScene().buildIndex;
+
+            if (LevelBestTimeSession.TryGetBestTime(targetSceneIndex, out float bestSeconds))
             {
                 bestTimeLabel.gameObject.SetActive(true);
                 bestTimeLabel.text = $"Best time: {FormatSeconds(bestSeconds)} seconds";
