@@ -280,6 +280,7 @@ public class LevelResetManager : MonoBehaviour
         }
 
         UpdateCloneUI();
+        StartActiveCloneReplays();
         Debug.Log($"[LevelResetManager] Turn {currentTurn} started.");
     }
 
@@ -303,7 +304,10 @@ public class LevelResetManager : MonoBehaviour
         {
             turnTimer.ResumeTimer();
         }
+    }
 
+    private void StartActiveCloneReplays()
+    {
         for (int i = 0; i < activeClones.Count; i++)
         {
             if (activeClones[i] != null)
