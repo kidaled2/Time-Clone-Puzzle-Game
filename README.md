@@ -1,4 +1,4 @@
-# Time Clone
+# Temporal Echo
 
 > **Solve puzzles together with your past selves.**
 
