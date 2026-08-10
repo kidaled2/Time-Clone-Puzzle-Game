@@ -2,7 +2,7 @@
 
 > **Solve puzzles together with your past selves.**
 
-Time Clone is a puzzle game built around a time-clone mechanic.
+Temporal Echo is a puzzle game built around a time-clone mechanic.
 
 The player can record their actions and create clones that replay those actions. By cooperating with their past selves, players can solve puzzles that would otherwise be impossible to complete alone.
 
@@ -12,7 +12,7 @@ The game is independently developed using **Unity and C#**.
 
 ## 🎬 Trailer
 
-[Watch the Time Clone Trailer](https://drive.google.com/file/d/1fF9CMgP0KFvGJqrpRR0kongFRP1gkNtv/view?usp=drive_link)
+[Watch the Temporal Echo Trailer](https://drive.google.com/file/d/1fF9CMgP0KFvGJqrpRR0kongFRP1gkNtv/view?usp=drive_link)
 
 ---
 
@@ -92,7 +92,7 @@ The project focuses on building a reliable and reusable system for recording and
 
 ## 🎨 My Contributions
 
-Time Clone is an independently developed project.
+Temporal Echo is an independently developed project.
 
 My responsibilities include:
 
@@ -111,7 +111,7 @@ My responsibilities include:
 
 ## 📈 Development
 
-Time Clone started as an experiment around the idea of cooperating with previous versions of yourself.
+Temporal Echo started as an experiment around the idea of cooperating with previous versions of yourself.
 
 The project currently contains **six playable levels** built around the core time-clone mechanic.
 
@@ -131,7 +131,7 @@ Planned development includes:
 
 ## 🎯 Project Goal
 
-Time Clone is being developed as my first independently released commercial game.
+Temporal Echo is being developed as my first independently released commercial game.
 
 The goal is to take the project through the complete game development cycle:
 
@@ -151,4 +151,4 @@ More information, screenshots, gameplay footage and a playable build will be add
 
 ## 📬 Contact
 
-Feel free to explore the repository and follow the development of Time Clone.
+Feel free to explore the repository and follow the development of Temporal Echo.
