@@ -187,6 +187,10 @@ namespace TimeClone.Player
 
             transform.position = position;
             transform.rotation = Quaternion.identity;
+            if (TryGetComponent(out PlayerMovementTrailController movementTrail))
+            {
+                movementTrail.ClearTrail();
+            }
         }
 
         private void HandleMoveInput(Vector2 inputDirection)

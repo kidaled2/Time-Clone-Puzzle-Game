@@ -36,6 +36,7 @@ public class CloneController : MonoBehaviour, IActorTag
     private Vector3 spawnRestScale = Vector3.one;
     private Coroutine spawnRoutine;
     private Coroutine flashRoutine;
+    private PlayerMovementTrailController movementTrail;
 
 #if DOTWEEN
     private Tween spawnTween;
@@ -49,6 +50,11 @@ public class CloneController : MonoBehaviour, IActorTag
         TryAssignWallLayerIfUnset();
         TryAssignGroundLayerIfUnset();
         spawnRestScale = transform.localScale;
+        movementTrail = GetComponent<PlayerMovementTrailController>();
+        if (movementTrail == null)
+        {
+            movementTrail = gameObject.AddComponent<PlayerMovementTrailController>();
+        }
     }
 
     private void Start()
@@ -69,6 +75,11 @@ public class CloneController : MonoBehaviour, IActorTag
         this.actorId = actorId;
         this.frames = frames;
         this.moveSpeed = Mathf.Max(0.01f, moveSpeed);
+
+        if (bodyMat != null)
+        {
+            movementTrail.SetColor(bodyMat.color);
+        }
 
         if (bodyMat != null)
         {

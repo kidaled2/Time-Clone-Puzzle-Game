@@ -1,0 +1,10 @@
+{
+    "name": "TemporalEcho.PlayModeTests",
+    "references": [
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
