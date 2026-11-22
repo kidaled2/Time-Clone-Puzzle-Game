@@ -1,5 +1,7 @@
 # Zor bölümler: 8 — Görev Devri, 9 — Çift Zamanlı Köprü
 
+Güncel devam akışı 7 → 8 → 9 → 10 → menüdür; Bölüm 10 eklendikten sonra 9'un normal çıkışı yeni bölüme bağlandı ve menü on düğmeye genişletildi. Bölüm seçiminden açılan sahneler tamamlanınca yine menüye döner. [Bölüm 10 — Ortak Yük](LEVEL_10.md).
+
 Bu bölümler mevcut kayıt, klon, plaka, kapı, rampa ve itilebilir kutu kurallarını kullanır. İkisinde de iki klon hakkı (üç tur) vardır. Zorluk yeni bir kontrol öğrenmekten değil, bir kayıttaki görevin ne zaman tamamlandığını ve sonraki aktörün neyi devralacağını planlamaktan gelir. Geniş bekleme aralıkları hassas refleks gerektirmeden zamanlamayı öğretecek şekilde seçildi. Gerçek oyuncularla zorluk algısı henüz ölçülmedi.
 
 ## Bölüm 8 — Görev Devri

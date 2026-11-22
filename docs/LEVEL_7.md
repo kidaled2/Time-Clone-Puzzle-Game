@@ -53,7 +53,7 @@ Kapı önüne erken gelinirse birinci klonun plakaya ulaşması beklenebilir. Pl
 - Klavye ile iki kayıt, iki sabit klon, son turda kutu itme, üst köprü ve Bölüm 8'e geçiş.
 - Input System dokunmatik kaydırmaları ve ekrandaki CLONE düğmesine dokunarak aynı tam çözüm.
 - Servis kapısı kapalıyken cebe girilememesi, yan duvarın kestirmeyi engellemesi, kutusuz üst geçişte alt kata düşülmesi.
-- Tur değişiminde kutunun başlangıç konumu ve son turda klon haklarının bitmesi. Güncel bölüm menüsü dokuz düğme içerir.
+- Tur değişiminde kutunun başlangıç konumu ve son turda klon haklarının bitmesi. Güncel bölüm menüsü on düğme içerir.
 - Gerçek menü düğmesinin tıklanmasıyla Bölüm 7'nin yüklenmesi ve bölüm seçimi modunun kurulması.
 - Bölüm 6'nın mevcut tam çözüm testinde sonraki sahne beklentisi 7 olarak güncellendi; geçiş ayrıca hedefli test edilir.
 

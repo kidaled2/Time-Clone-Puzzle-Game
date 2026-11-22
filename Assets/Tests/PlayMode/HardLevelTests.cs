@@ -87,7 +87,7 @@ namespace TemporalEcho.Tests
                 var buttons = Resources.FindObjectsOfTypeAll<MonoBehaviour>()
                     .Where(b => b != null && b.gameObject.scene.name == "MainMenu" &&
                                 b.GetType().Name == "LevelSelectButton").ToArray();
-                Assert.That(buttons.Length, Is.EqualTo(9));
+                Assert.That(buttons.Length, Is.EqualTo(10));
                 var button = GameObject.Find("LevelButton_" + level).GetComponent<Button>();
                 Assert.That(button.interactable, Is.True);
                 button.onClick.Invoke();
@@ -186,7 +186,7 @@ namespace TemporalEcho.Tests
             yield return WaitFor(() => Plate(9, 2), 10f, "The delayed clone must enter the service pocket.");
             Assert.That(Plate(9, 1), Is.True);
             yield return Move(Key.A, 2);
-            yield return ExpectScene("MainMenu");
+            yield return ExpectScene("Level_10");
         }
 
         private IEnumerator CloneTurn()

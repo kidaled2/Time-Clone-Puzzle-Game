@@ -3221,11 +3221,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 741804566115567996, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
       propertyPath: nextSceneName
-      value: MainMenu
+      value: Level_10
       objectReference: {fileID: 0}
     - target: {fileID: 741804566115567996, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
       propertyPath: nextSceneIndex
-      value: 0
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2256776146957795892, guid: ffcc9bb743412a94a9661cf7179ae025, type: 3}
       propertyPath: m_TextStyleHashCode
