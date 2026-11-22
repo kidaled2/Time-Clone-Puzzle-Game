@@ -102,7 +102,7 @@ namespace TemporalEcho.Tests
             float deadline = Time.realtimeSinceStartup + 4f;
             while (SceneManager.GetActiveScene().name == "Level_11" && Time.realtimeSinceStartup < deadline)
                 yield return null;
-            Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo("MainMenu"));
+            Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo("Level_12"));
         }
 
         private IEnumerator ExpectChord(int chord, int westX, int westZ, int eastX, int eastZ)

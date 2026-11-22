@@ -18,4 +18,4 @@ Yönler oyuncunun hareket eksenlerine göredir. W kuzey, D doğudur. Her satır 
 
 ## Doğrulama
 
-`LevelElevenTests` menü girişini ve gerçek sahnede hem klavye hem de kaydırma / CLONE girdisiyle çözümü kapsar. Kapının başlangıçta geçit vermediğini, ilk iki turda ilerleme olmadığını ve üç aşama sonunda kalıcı olarak açıldığını kontrol eder. Normal kampanya geçişi 10 → 11 → ana menüdür.
+`LevelElevenTests` menü girişini ve gerçek sahnede hem klavye hem de kaydırma / CLONE girdisiyle çözümü kapsar. Kapının başlangıçta geçit vermediğini, ilk iki turda ilerleme olmadığını ve üç aşama sonunda kalıcı olarak açıldığını kontrol eder. Kampanya akışı 10 → 11 → 12 olarak devam eder.
