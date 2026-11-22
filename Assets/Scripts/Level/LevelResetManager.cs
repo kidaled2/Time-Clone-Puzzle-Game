@@ -50,6 +50,7 @@ public class LevelResetManager : MonoBehaviour
     private bool waitingForFirstMove;
     private bool hasPendingFirstMoveFrame;
     private MovementFrame pendingFirstMoveFrame;
+    private Button endTurnControl;
 
     private void Awake()
     {
@@ -73,6 +74,11 @@ public class LevelResetManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (endTurnControl != null)
+        {
+            endTurnControl.onClick.RemoveListener(EndTurn);
+        }
+
         if (turnTimer != null)
         {
             turnTimer.OnTimerExpired -= OnTurnTimerExpired;
@@ -96,6 +102,8 @@ public class LevelResetManager : MonoBehaviour
             EndTurn();
         }
 
+        UpdateEndTurnInteractivity();
+
         if (turnTimer != null && turnTimer.IsRunning && turnTimerUI != null)
         {
             turnTimerUI.UpdateDisplay(turnTimer.TimeRemaining);
@@ -107,34 +115,33 @@ public class LevelResetManager : MonoBehaviour
     /// </summary>
     public void EndTurn()
     {
-        if (isResetting)
+        if (!CanEndTurn())
         {
             return;
         }
 
-        if (levelConfig == null || recorder == null)
-        {
-            Debug.LogWarning("[LevelResetManager] Missing levelConfig or recorder reference.");
-            return;
-        }
-
+        isResetting = true;
         recorder.StopRecording();
-        List<MovementFrame> frames = new List<MovementFrame>(recorder.GetRecordedFrames());
+        List<MovementFrame> frames = recorder.GetRecordedFrames();
         EnsureFirstMoveFrameRecorded(frames);
         allRecordings.Add(frames);
-
-        if (currentTurn >= levelConfig.maxTurns)
-        {
-            Debug.Log("[LevelResetManager] Max turns reached.");
-            return;
-        }
+        UpdateEndTurnInteractivity();
 
         StartCoroutine(ResetAndStartNextTurn());
     }
 
+    private bool CanEndTurn()
+    {
+        return !isResetting
+            && Time.timeScale > 0f
+            && hasPendingFirstMoveFrame
+            && levelConfig != null
+            && recorder != null
+            && currentTurn < levelConfig.maxTurns;
+    }
+
     private IEnumerator ResetAndStartNextTurn()
     {
-        isResetting = true;
         SyncBoxReferences();
 
         if (levelExit != null)
@@ -392,14 +399,22 @@ public class LevelResetManager : MonoBehaviour
             return;
         }
 
-        Button button = endTurnButton.GetComponent<Button>();
-        if (button == null)
+        endTurnControl = endTurnButton.GetComponent<Button>();
+        if (endTurnControl == null)
         {
             return;
         }
 
-        button.onClick.RemoveListener(EndTurn);
-        button.onClick.AddListener(EndTurn);
+        endTurnControl.onClick.AddListener(EndTurn);
+        UpdateEndTurnInteractivity();
+    }
+
+    private void UpdateEndTurnInteractivity()
+    {
+        if (endTurnControl != null)
+        {
+            endTurnControl.interactable = CanEndTurn();
+        }
     }
 
     private void UpdateCloneUI()

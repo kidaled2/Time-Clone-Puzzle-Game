@@ -32,6 +32,98 @@ namespace TemporalEcho.Tests
         }
 
         [UnityTest]
+        public IEnumerator LevelOneHoldTheExitPlate()
+        {
+            yield return LoadLevel(1);
+            yield return Move(Key.W, 3);
+            yield return CloneTurn();
+            yield return Move(Key.W, 5);
+            yield return new WaitForSeconds(0.6f);
+            yield return Move(Key.W, 2);
+            yield return ExpectNextScene(2);
+        }
+
+        [UnityTest]
+        public IEnumerator LevelTwoOpenTwoDoorsInOrder()
+        {
+            yield return LoadLevel(2);
+            yield return Move(Key.D, 2);
+            yield return Move(Key.W, 2);
+            yield return Move(Key.D);
+            yield return new WaitForSeconds(3f);
+            yield return Move(Key.A, 2);
+            yield return CloneTurn();
+
+            yield return Move(Key.W, 3);
+            yield return new WaitForSeconds(0.7f);
+            yield return Move(Key.W, 2);
+            yield return new WaitForSeconds(3.2f);
+            yield return Move(Key.W, 2);
+            yield return ExpectNextScene(3);
+        }
+
+        [UnityTest]
+        public IEnumerator LevelThreeUseTwoClones()
+        {
+            yield return LoadLevel(3);
+            yield return Move(Key.W, 3);
+            yield return Move(Key.A, 3);
+            yield return CloneTurn();
+
+            yield return Move(Key.W, 2);
+            yield return Move(Key.D, 3);
+            yield return new WaitForSeconds(0.9f);
+            yield return Move(Key.S, 2);
+            yield return CloneTurn();
+
+            yield return Move(Key.W, 5);
+            yield return new WaitForSeconds(2f);
+            yield return Move(Key.W, 2);
+            yield return ExpectNextScene(4);
+        }
+
+        [UnityTest]
+        public IEnumerator LevelFourTimeThreeElevatedDoors()
+        {
+            yield return LoadLevel(4);
+            yield return Move(Key.D, 2);
+            yield return Move(Key.W, 2);
+            yield return new WaitForSeconds(3f);
+            yield return Move(Key.W, 2);
+            yield return new WaitForSeconds(2f);
+            yield return Move(Key.A, 2);
+            yield return CloneTurn();
+
+            yield return Move(Key.A, 3);
+            yield return Move(Key.W, 4);
+            yield return new WaitForSeconds(3.15f);
+            yield return Move(Key.W, 2);
+            yield return new WaitForSeconds(2f);
+            yield return Move(Key.D, 3);
+            yield return ExpectNextScene(5);
+        }
+
+        [UnityTest]
+        public IEnumerator LevelFiveUseTheBoxAndHoldThePlate()
+        {
+            yield return LoadLevel(5);
+            yield return Move(Key.A, 5);
+            yield return Move(Key.W, 2);
+            yield return Move(Key.D, 4);
+            yield return Move(Key.A, 4);
+            yield return Move(Key.W, 4);
+            yield return CloneTurn();
+
+            yield return Move(Key.W);
+            yield return new WaitForSeconds(3.3f);
+            yield return Move(Key.W, 2);
+            yield return new WaitForSeconds(1.3f);
+            yield return Move(Key.W, 3);
+            yield return Move(Key.A, 3);
+            yield return ExpectNextScene(6);
+        }
+
+        [UnityTest]
         public IEnumerator LevelSixCrossTwoGapsWithOneBox()
         {
             yield return LoadLevel(6);
