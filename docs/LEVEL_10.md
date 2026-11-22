@@ -42,6 +42,6 @@ Yanlış kola inmek ya da geçit hazır olmadan aşağıya adım atmak reset ger
 - Kutusuz erken geçiş oyuncuyu alt kata düşürür; çıkışa tırmanılamaz.
 - Gerçek menü düğmesi sahneyi üst başlangıçla açar; sahnede kapı/plaka/rampa yoktur.
 
-Normal akış 9 → 10 → menü; menüden seçilen bölüm mevcut kural gereği tamamlanınca menüye döner. Menü on düğmeye uyarlanmıştır. Önceki bölümün yalnızca klavye çözümü, değişen 9→10 geçişi için tekrar çalıştırılır. Tüm eski bölümler ve fiziksel Android koşusu bu görevde çalıştırılmaz.
+Kampanya akışı 9 → 10 → 11 olarak devam eder. Bölüm seçiminden açılan bölüm tamamlanınca oyuncu menüye döner.
 
 22 Kasım 2026: Beş hedefli PlayMode kontrolü ilk koşuda 5/5 geçti (57,57 sn). Yeni bölümün klavye ve dokunmatik tam çözümleri, istasyon/erken düşüş kontrolleri, gerçek menü girişi ve 9→10 geçişi doğrulandı. Bağımsız statik incelemede sahne referansları ve geometride engelleyici bulgu yok. Kanıt: `Logs/Level10/test-results.json`, `level10.png`, `cooperation.png`, `menu-ten.png`. Fiziksel Android ve yeni oyuncularla keşif testi bekliyor.

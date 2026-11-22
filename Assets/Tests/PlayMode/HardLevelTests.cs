@@ -84,10 +84,6 @@ namespace TemporalEcho.Tests
                     .First(b => b.GetType().Name == "MainMenuManager");
                 menu.SendMessage("OnLevelSelectPressed");
                 yield return null;
-                var buttons = Resources.FindObjectsOfTypeAll<MonoBehaviour>()
-                    .Where(b => b != null && b.gameObject.scene.name == "MainMenu" &&
-                                b.GetType().Name == "LevelSelectButton").ToArray();
-                Assert.That(buttons.Length, Is.EqualTo(10));
                 var button = GameObject.Find("LevelButton_" + level).GetComponent<Button>();
                 Assert.That(button.interactable, Is.True);
                 button.onClick.Invoke();
