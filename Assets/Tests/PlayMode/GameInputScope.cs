@@ -7,22 +7,26 @@ namespace TemporalEcho.Tests
     internal sealed class GameInputScope : IDisposable
     {
         private readonly InputSettings original;
-        private readonly InputSettings testSettings;
+        private readonly InputSettings.BackgroundBehavior originalBackgroundBehavior;
+        private readonly InputSettings.EditorInputBehaviorInPlayMode originalEditorBehavior;
 
         public GameInputScope()
         {
             original = InputSystem.settings;
-            testSettings = UnityEngine.Object.Instantiate(original);
+            originalBackgroundBehavior = original.backgroundBehavior;
+            originalEditorBehavior = original.editorInputBehaviorInPlayMode;
             // Batch mode has no focused Game View. Route synthetic devices to the game anyway.
-            testSettings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
-            testSettings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
-            InputSystem.settings = testSettings;
+            // Keep the same settings object: Unity's reload snapshot can retain a temporary
+            // clone after it is destroyed, breaking InputSystem initialization on the next run.
+            original.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            original.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
         }
 
         public void Dispose()
         {
+            original.backgroundBehavior = originalBackgroundBehavior;
+            original.editorInputBehaviorInPlayMode = originalEditorBehavior;
             InputSystem.settings = original;
-            UnityEngine.Object.Destroy(testSettings);
         }
     }
 }
